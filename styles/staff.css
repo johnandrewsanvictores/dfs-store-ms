@@ -1,0 +1,61 @@
+.header-staff {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.controls-staff {
+    display: flex;
+    gap: 0.5em;
+}
+
+.controls-staff button {
+    font-size: var(--small);
+    padding: 0.5em 1em;
+    color: var(--font-white);
+    cursor: pointer;
+    outline: none;
+    border: 1px solid var(--stroke-grey);
+    border-radius: 5px;
+    margin-bottom: 1em;
+    font-family: inherit;
+}
+
+#staff-new-btn {
+    background-color: var(--primary);
+}
+
+#edit-btn {
+    background-color: var(--green);
+}
+
+#remove-btn {
+    background-color: var(--red);
+}
+
+#staff-new-btn:hover {
+    background-color: #d470ae;;
+}
+
+#edit-btn:hover {
+    background-color: #71f39c;
+}
+
+#remove-btn:hover {
+    background-color: rgb(226, 144, 144);
+}
+
+
+
+.table-div {
+    width: 100%;
+}
+
+/* adjust the width when closing and opening the sidebar */
+.dt-scroll-headInner, .dt-scroll-headInner > table, .dt-scroll-footInner, .dt-scroll-footInner > table {
+    width: 100% !important;
+}
+
+#table-div table{
+    width: 100%;
+}
