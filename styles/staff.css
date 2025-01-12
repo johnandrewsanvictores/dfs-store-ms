@@ -45,6 +45,18 @@
     background-color: rgb(226, 144, 144);
 }
 
+#selectAll-btn {
+    margin-left: 3em;
+    background-color: var(--dark-bg);
+}
+
+#deselect-btn {
+    background-color: var(--dark-bg);
+}
+
+#selectAll-btn:hover, #deselect-btn:hover {
+    background-color: rgb(100, 100, 100);
+}
 
 
 .table-div {

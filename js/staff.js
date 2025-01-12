@@ -14,21 +14,24 @@ const Table = (function() {
         return new DataTable('#staff-table', {
             scrollX: true,
             responsive: true,
-            // processing: true,
-            // serverSide: true,
-            // ajax: {
-            //     url: "../api/staff_api.php",
-            //     type: "post",
-            //     // data: {'action' : "datatableDisplay", "selected_field" : select_field_node.value},
-            // },
-            // // ajax: "../../api/business_datatable_api.php",
-            // "columns": [
-            //     { "data": "id", visible: false },
-            //     { "data": "name" },
-            //     { "data": "field" },
-            //     { "data": "location" },
-            //     { "data": "contact_number" },
-            // ]
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "../api/staff_api.php",
+                type: "post",
+                data: {'action' : "datatableDisplay"},
+            },
+            // ajax: "../../api/business_datatable_api.php",
+            "columns": [
+                { "data": "id", visible: false },
+                { "data": "staff_id" },
+                { "data": "name" },
+                { "data": "username" },
+                { "data": "phone_number" },
+                { "data": "role" },
+                { "data": "date_added" },
+                { "data": "last_login" },
+            ]
         });
     }
 

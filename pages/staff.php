@@ -35,6 +35,13 @@
                     <i class="fas fa-trash"></i>
                     <span>Remove</span>
                 </button>
+
+                <button id="selectAll-btn">
+                    <span>Select All</span>
+                </button>
+                <button id="deselect-btn">
+                    <span>Deselect All</span>
+                </button>
             </div>
         </div>
 
@@ -42,6 +49,7 @@
             <table id="staff-table" class="display stripe" style="width:100%">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Staff Id</th>
                         <th>Name</th>
                         <th>Username</th>
@@ -54,6 +62,7 @@
                 <tbody>
 
                     <tr>
+                        <td></td>
                         <td>STF001</td>
                         <td>John Andrew San Victores</td>
                         <td>Drew</td>
@@ -64,6 +73,7 @@
                     </tr>
 
                     <tr>
+                        <td></td>
                         <td>STF002</td>
                         <td>Andrew San Victores</td>
                         <td>Drew</td>
@@ -74,6 +84,7 @@
                     </tr>
 
                     <tr>
+                        <td></td>
                         <td>STF003</td>
                         <td>John </td>
                         <td>Drew</td>
@@ -86,6 +97,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
+                        <th>Id</th>
                         <th>Staff Id</th>
                         <th>Name</th>
                         <th>Username</th>
