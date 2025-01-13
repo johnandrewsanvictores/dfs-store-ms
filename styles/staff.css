@@ -34,15 +34,15 @@
 }
 
 #staff-new-btn:hover {
-    background-color: #d470ae;;
+    background-color: var(--primary-hover-color);
 }
 
 #edit-btn:hover {
-    background-color: #71f39c;
+    background-color: var(--green-hover-color);
 }
 
 #remove-btn:hover {
-    background-color: rgb(226, 144, 144);
+    background-color: var(--red-hover-color);
 }
 
 #selectAll-btn {
@@ -55,9 +55,8 @@
 }
 
 #selectAll-btn:hover, #deselect-btn:hover {
-    background-color: rgb(100, 100, 100);
+    background-color: var(--dark-hover-color);
 }
-
 
 .table-div {
     width: 100%;

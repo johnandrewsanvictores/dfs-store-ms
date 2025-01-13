@@ -5,7 +5,28 @@ document.addEventListener("DOMContentLoaded", function() {
     table = Table.initDataTable();
     Table.addSelectEvent(table);
 
+    Controls.add_events();
+
 });
+
+
+const Controls = (function() {
+    const new_btn = document.querySelector("#staff-new-btn");
+    const edit_btn = document.querySelector("#edit-btn");
+    const remove_btn = document.querySelector("#remove-btn");
+    const select_all = document.querySelector("#selectAll-btn");
+    const deselect_all = document.querySelector("#deselect-btn");
+
+
+    function add_events() {
+        new_btn.addEventListener("click", Staff_form_functions.show_staff_form)
+    }
+
+    return {
+        add_events
+    }
+
+})();
 
 
 
