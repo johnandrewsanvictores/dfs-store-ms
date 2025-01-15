@@ -2,6 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function() {
     Staff_form_functions.add_events()
+    Form_Validation.rmv_error_msg_on_data_change();
 })
 
 const Staff_form_functions = (function() {
@@ -74,7 +75,8 @@ const Staff_form_functions = (function() {
         cancel_form,
         show_staff_form,
         change_password_type_input,
-        add_events
+        add_events,
+        reset_form
     }
 
 })();
@@ -121,6 +123,7 @@ const Form_Validation = (function() {
             isValid = false;
         }else if(password.length < 8) {
             show_error('password', 'Password must be 8 characters.');
+            isValid = false;
         }else if(password !== cpassword) {
             show_error('cpassword', 'Password and confirm password doesn\'t match.');
             isValid = false;

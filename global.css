@@ -76,12 +76,3 @@ body {
     font-weight: 400;
     line-height: 1.6;
 }
-
-input[type="password"]::-ms-reveal, /* For Edge */
-input[type="password"]::-ms-clear,  /* For Edge clear icon */
-input[type="password"]::-webkit-clear-button, /* For Chrome clear button */
-input[type="password"]::-webkit-inner-spin-button, /* Prevent other UI in webkit */
-input[type="password"]::-webkit-outer-spin-button {
-    display: none;
-    pointer-events: none;
-}

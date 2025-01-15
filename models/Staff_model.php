@@ -101,4 +101,74 @@ class Staff_Account_Model
             return json_encode($this->response);
         }
     }
+
+    public function add_staff_acc($staff_id, $name, $username, $phone_number, $role, $password)
+    {
+        try {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Check if the name already exists in the staff_acc table
+            $nameCheckSql = "SELECT COUNT(*) FROM staff_acc WHERE name = :name OR username = :uname";
+            $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
+            $nameCheckStmt->bindValue(':name', $name);
+            $nameCheckStmt->bindValue(':uname', $username);
+            $nameCheckStmt->execute();
+
+            // Get the count of matching names
+            $exists = $nameCheckStmt->fetchColumn();
+
+            if ($exists > 0) {
+                $this->response['success'] = false;
+                $this->response['message'] = "The Staff already exists!";
+                return json_encode($this->response);
+            }
+
+            $stmt = $this->pdo->prepare("INSERT INTO staff_acc (staff_id, name, username, phone_number, role, password)
+                                     VALUES (:staff_id, :name, :uname, :pnumber, :role, :password)");
+
+            $stmt->bindParam(':staff_id', $staff_id);
+            $stmt->bindParam(':name', $name);
+            $stmt->bindParam(':uname', $username);
+            $stmt->bindParam(':pnumber', $phone_number);
+            $stmt->bindParam(':role', $role);
+            $stmt->bindParam(':password', $password);
+
+            $stmt->execute();
+
+            $this->response['success'] = true;
+            $this->response['message'] = "Staff account data added successfully.";
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error adding Staff account data: " . $e->getMessage();
+        }
+
+        return json_encode($this->response);
+    }
+
+    public function generate_next_staff_id()
+    {
+        try {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Retrieve the last staff_id from the database
+            $query = "SELECT staff_id FROM staff_acc ORDER BY id DESC LIMIT 1";
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute();
+
+            $lastStaffId = $stmt->fetchColumn();
+
+            if ($lastStaffId) {
+                $numericPart = (int)substr($lastStaffId, 3);
+                $nextNumericPart = $numericPart + 1;
+                $staff_id = 'STF' . str_pad($nextNumericPart, 3, '0', STR_PAD_LEFT);
+            } else {
+                // If no records exist, start with STF001
+                $staff_id = 'STF001';
+            }
+
+            return $staff_id;
+        } catch (PDOException $e) {
+            return "Error generating staff_id: " . $e->getMessage();
+        }
+    }
 }

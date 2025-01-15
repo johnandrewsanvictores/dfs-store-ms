@@ -258,4 +258,18 @@
     .select:hover::after {
         color: var(--secondary);
     }
+
+    input[type="password"]::-ms-reveal {
+        display: none !important;
+    }
+
+    /* Remove the clear icon for text inputs in Edge, if not needed */
+    input[type="password"]::-ms-clear {
+        display: none !important;
+    }
+
+    /* Remove password eye for Chrome and WebKit browsers */
+    input[type="password"]::-webkit-textfield-decoration-container {
+        display: none !important;
+    }
 </style>

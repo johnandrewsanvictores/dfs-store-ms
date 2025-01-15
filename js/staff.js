@@ -31,20 +31,68 @@ const Controls = (function() {
 
 const Staff_Form_Main = (function() {
     const staff_form = document.getElementById("staff-form");
+    const form_title = document.querySelector(".staff-header-form h5");
 
     function add_events() {
         console.log(staff_form);
         staff_form.addEventListener('submit', submit_data);
-        Form_Validation.rmv_error_msg_on_data_change();
     }
 
     function submit_data(e) {
         e.preventDefault();
-        Form_Validation.validate_staff_information();
+
+        if(Form_Validation.validate_staff_information()){
+            if(form_title.textContent === "Add New Staff Account") {
+                Request_Staff.add_data(staff_form);
+            }
+            // else if(form_title.textContent === "Update Staff Account") {
+            //     Request_Staff.updateData();
+            // }
+        };
+
+        
     }
 
     return {
         add_events
+    }
+})();
+
+
+const Request_Staff = (function() {
+
+    function add_data(form) {
+        const formData = new FormData(form);
+        formData.append('action', "add_data")
+
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/dfs-store-ms/api/staff_api.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        table.context[0].ajax.data = {'action' : "datatableDisplay"}
+                        table.draw();
+                        Popup1.show_message(response.message, 'success');
+                        Staff_form_functions.reset_form();
+                        Staff_form_functions.cancel_form();
+                        Table.deselect_all_selected_row();
+                    } else {
+                        Popup1.show_message(response.message, 'error');
+                    }
+                } else {
+                    console.error('Error:', xhr.status);
+                }
+            }
+        };
+        xhr.send(formData);
+    }
+
+    return {
+        add_data
     }
 })();
 
@@ -106,5 +154,38 @@ const Table = (function() {
         removeRow,
         deselect_all_selected_row,
         select_all_rows
+    }
+})();
+
+
+const Popup1 = (function() {
+    function show_message(msg, icon) {
+        Swal.fire({
+            position: "top right",
+            icon: icon,
+            title: msg,
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+
+    function show_confirm_dialog(msg, callback) {
+        Swal.fire({
+            text: msg,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                callback();
+            }
+        });
+    }
+
+    return {
+        show_message,
+        show_confirm_dialog
     }
 })();
