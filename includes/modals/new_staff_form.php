@@ -8,24 +8,24 @@
         <form action="" method="POST" id="staff-form">
             <div class="input-div">
                 <label for="name">Name<span>*</span></label>
-                <input type="text" name="name" id="name">
+                <input type="text" name="name" id="name" placeholder="Enter the name">
             </div>
 
             <div class="input-div">
                 <label for="username">Username<span>*</span></label>
-                <input type="text" name="username" id="username">
+                <input type="text" name="username" id="username" placeholder="Enter the username">
             </div>
 
             <div class="input-div">
                 <label for="pnumber">Phone number<span>*</span></label>
-                <input type="text" name="pnumber" id="pnumber">
+                <input type="text" name="pnumber" id="pnumber" placeholder="09xxxxxxxxx">
             </div>
 
             <div class="input-div">
                 <label for="role">Role<span>*</span></label>
                 <div class="container">
                     <div class="select">
-                        <select>
+                        <select name="role" id="role">
                             <option value="" disabled selected>Select an option</option>
                             <option value="admin">Admin</option>
                             <option value="cashier">Cashier</option>
@@ -38,10 +38,9 @@
                 <div class="input-div">
                     <label for="password">Password<span>*</span></label>
                     <div class="password-input-div">
-                        <input type="password" name="password" id="password">
+                        <input type="password" name="password" id="password" placeholder="Enter the password">
                         <div>
                             <i class="fa-regular fa-eye show-pass-btn" id=""></i>
-                            <!-- <i class="fa-regular fa-eye-slash"></i> -->
                         </div>
                     </div>
                 </div>
@@ -49,17 +48,16 @@
                 <div class="input-div">
                     <label for="cpassword">Confirm Password<span>*</span></label>
                     <div class="password-input-div">
-                        <input type="password" name="cpassword" id="cpassword">
+                        <input type="password" name="cpassword" id="cpassword" placeholder="Re-enter the password">
                         <div>
                             <i class="fa-regular fa-eye show-pass-btn" id=""></i>
-                            <!-- <i class="fa-regular fa-eye-slash" id="hide-pass-btn"></i> -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="form-btn-container">
-                <button id="cancel-staff-form-btn" type="button">Cancel</button>
+                <button id="reset-staff-form-btn" type="button">Reset</button>
                 <button id="submit-staff-form-btn" type="submit" name="submit">Submit</button>
             </div>
         </form>
@@ -159,7 +157,8 @@
 
 
     .password-container {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 1em;
     }
 
@@ -195,7 +194,7 @@
         cursor: pointer;
     }
 
-    #cancel-staff-form-btn {
+    #reset-staff-form-btn {
         background-color: var(--white-bg);
         border: 1px solid var(--stroke-grey);
         color: var(--font-dark);
@@ -260,79 +259,3 @@
         color: var(--secondary);
     }
 </style>
-
-
-<script>
-    const staff_form_wrapper = document.querySelector(".staff-form-wrapper");
-    const staff_form_container = document.querySelector(".staff-form-container");
-
-    const x_form_btn = document.querySelector("#x-staff-form-btn");
-    const eye_btns = document.querySelectorAll('.show-pass-btn');
-    const hide_pass_btn = document.querySelector('#hide-pass-btn');
-
-    const cancel_form_btn = document.querySelector("#cancel-staff-form-btn");
-    const submit_form_btn = document.querySelector("#submit-staff-form-btn");
-
-    document.addEventListener("DOMContentLoaded", function() {
-        x_form_btn.addEventListener("click", Staff_form_functions.cancel_form);
-        cancel_form_btn.addEventListener("click", Staff_form_functions.cancel_form);
-
-        eye_btns.forEach(btn => {
-            btn.addEventListener("click", Staff_form_functions.change_password_type_input)
-        });
-    })
-
-    const Staff_form_functions = (function() {
-
-        function cancel_form() {
-            staff_form_container.style.opacity = '0';
-            staff_form_container.style.visibility = 'hidden';
-            staff_form_container.style.transform = 'scale(0)';
-
-            staff_form_wrapper.style.opacity = '0';
-            staff_form_wrapper.style.visibility = 'hidden';
-            staff_form_wrapper.style.transform = 'scale(0)';
-
-            document.querySelector('#staff-form').reset();
-            eye_btns.forEach(eye_btn => {
-                eye_btn.classList.replace("fa-eye-slash", "fa-eye");
-                eye_btn.classList.replace("hide-pass-btn", "show-pass-btn")
-            });
-        }
-
-        function show_staff_form() {
-            staff_form_container.style.opacity = '1';
-            staff_form_container.style.visibility = 'visible';
-            staff_form_container.style.transform = 'scale(1)';
-
-            staff_form_wrapper.style.opacity = '1';
-            staff_form_wrapper.style.visibility = 'visible';
-            staff_form_wrapper.style.transform = 'scale(1)';
-        }
-
-        function change_password_type_input(e) {
-            const eye_btn = e.target;
-            const input_field = eye_btn.parentElement.previousElementSibling;
-            const eye_btn_container = eye_btn.parentElement;
-
-
-
-            if (eye_btn.classList.contains("show-pass-btn")) {
-                input_field.type = "text";
-                eye_btn.classList.replace("fa-eye", "fa-eye-slash");
-                eye_btn.classList.replace("show-pass-btn", "hide-pass-btn")
-            } else if (eye_btn.classList.contains("hide-pass-btn")) {
-                input_field.type = "password";
-                eye_btn.classList.replace("fa-eye-slash", "fa-eye");
-                eye_btn.classList.replace("hide-pass-btn", "show-pass-btn")
-            }
-        }
-
-        return {
-            cancel_form,
-            show_staff_form,
-            change_password_type_input
-        }
-
-    })();
-</script>

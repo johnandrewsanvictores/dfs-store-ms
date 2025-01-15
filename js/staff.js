@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     Controls.add_events();
 
+    Staff_Form_Main.add_events();
 });
 
 
@@ -28,6 +29,24 @@ const Controls = (function() {
 
 })();
 
+const Staff_Form_Main = (function() {
+    const staff_form = document.getElementById("staff-form");
+
+    function add_events() {
+        console.log(staff_form);
+        staff_form.addEventListener('submit', submit_data);
+        Form_Validation.rmv_error_msg_on_data_change();
+    }
+
+    function submit_data(e) {
+        e.preventDefault();
+        Form_Validation.validate_staff_information();
+    }
+
+    return {
+        add_events
+    }
+})();
 
 
 const Table = (function() {

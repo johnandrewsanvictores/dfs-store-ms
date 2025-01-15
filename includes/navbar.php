@@ -289,7 +289,7 @@
         position: relative;
         min-height: 100vh;
         z-index: 100;
-        background: #e7f2fd;
+        background: rgb(250, 250, 248);
     }
 </style>
 
