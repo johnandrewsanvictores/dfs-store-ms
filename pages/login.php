@@ -1,6 +1,48 @@
 <?php
+session_start();
+
+if (isset($_SESSION['username'])) {
+    header("Location: staff.php");
+    exit();
+}
 
 require('../includes/connection.php');
+
+$errorMsg = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
+    $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_SPECIAL_CHARS);
+
+    if (!empty($username) && !empty($password)) {
+        try {
+            $query = "SELECT * FROM staff_acc WHERE username = :username";
+            $stmt = $connection->prepare($query);
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->execute();
+
+            // Check if the user exists
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                if (password_verify($password, $user['password'])) {
+                    $_SESSION['username'] = $user['username'];
+                    header("Location: staff.php");
+                    exit();
+                } else {
+                    $errorMsg = "Invalid username or password!";
+                }
+            } else {
+                $errorMsg = "Username does not exist!";
+            }
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+            $errorMsg = "Something went wrong. Please try again later.";
+        }
+    } else {
+        $errorMsg = "Both username and password are required!";
+    }
+}
 
 ?>
 
@@ -25,7 +67,7 @@ require('../includes/connection.php');
 
             <div class="content-container">
                 <h4>STAFF LOGIN</h4>
-                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post">
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
 
                     <label for="username">Username:</label>
                     <input type="text" name="username" id="username">
@@ -38,34 +80,11 @@ require('../includes/connection.php');
                     </div>
 
                     <?php
-                    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                        $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_SPECIAL_CHARS);
-                        $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_SPECIAL_CHARS);
-                        $errorMsg = "";
-                        if (!empty($username) || !empty($password)) {
-                            $query  = "SELECT * FROM staff_acc WHERE username = '$username'";
-                            $result = mysqli_query($conn, $query);
-                            if (mysqli_num_rows($result) == 1) {
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                    if (password_verify($password, $row['password'])) {
-                                        session_start();
-                                        $_SESSION['username'] = $row['username'];
-                                        header("Location:dashboard.php");
-                                    } else {
-                                        $errorMsg = "Username or Password is invalid!";
-                                    }
-                                }
-                            } else {
-                                $errorMsg = "Username does not exist!";
-                            }
-                        } else {
-                            $errorMsg = "Username and Password is required!";
-                        }
-
+                    if (!empty($errorMsg)) {
                         echo "<p class='error-msg'>$errorMsg</p>";
                     }
-
                     ?>
+
                 </form>
 
             </div>
