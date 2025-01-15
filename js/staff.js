@@ -20,7 +20,8 @@ const Controls = (function() {
 
 
     function add_events() {
-        new_btn.addEventListener("click", Staff_form_functions.show_staff_form)
+        new_btn.addEventListener("click", Staff_Form_Main.add_data_event);
+        edit_btn.addEventListener("click", Staff_Form_Main.edit_data_event);
     }
 
     return {
@@ -32,9 +33,9 @@ const Controls = (function() {
 const Staff_Form_Main = (function() {
     const staff_form = document.getElementById("staff-form");
     const form_title = document.querySelector(".staff-header-form h5");
+    const password_note = document.getElementById("passw-note");
 
     function add_events() {
-        console.log(staff_form);
         staff_form.addEventListener('submit', submit_data);
     }
 
@@ -45,16 +46,61 @@ const Staff_Form_Main = (function() {
             if(form_title.textContent === "Add New Staff Account") {
                 Request_Staff.add_data(staff_form);
             }
-            // else if(form_title.textContent === "Update Staff Account") {
-            //     Request_Staff.updateData();
-            // }
+            else if(form_title.textContent === "Update Staff Account") {
+                Request_Staff.update_data(staff_form);
+            }
         };
 
-        
+        Form_Validation.rmv_error_msg_on_data_change();
+    }
+
+    function add_data_event(e) {
+        Staff_form_functions.show_staff_form();
+        Table.deselect_all_selected_row();
+        form_title.textContent = "Add New Staff Account"
+        password_note.style.display = "none";
+    }
+
+    function fill_info(response) {
+        var data = response[0];
+        const name = document.querySelector('#name');
+        const username = document.querySelector('#username');
+        const phone_number = document.querySelector('#pnumber');
+        const role_select_el = document.querySelector('#staff-form select[name="role"]');
+
+        const staff_id = document.querySelector('input[name="staff-id"]');
+
+        name.value = data.name;
+        username.value = data.username;
+        phone_number.value = data.phone_number;
+        role_select_el.value = data.role;
+        staff_id.value = data.staff_id;
+
+    }
+
+    async function edit_data_event(e) {
+        const selected_rows = Table.getSelectedRow(table);
+        form_title.textContent = "Update Staff Account";
+        password_note.style.display = "block";
+
+        if(selected_rows.length != 1) {
+            Popup1.show_message('Please ensure only one row is selected.', 'warning') ;
+            Table.deselect_all_selected_row();
+            return;
+        }
+    
+        const data = await Request_Staff.get_specific_staff_acc_data(selected_rows[0].id);
+        Staff_Form_Main.fill_info(data);
+
+        Table.deselect_all_selected_row();
+        Staff_form_functions.show_staff_form();
     }
 
     return {
-        add_events
+        add_events,
+        add_data_event,
+        edit_data_event,
+        fill_info
     }
 })();
 
@@ -91,8 +137,66 @@ const Request_Staff = (function() {
         xhr.send(formData);
     }
 
+    function update_data(form) {
+        const formData = new FormData(form);
+        formData.append('action', 'update_data');
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/dfs-store-ms/api/staff_api.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        table.context[0].ajax.data = {'action' : "datatableDisplay"}
+                        table.draw();
+                        Staff_form_functions.reset_form();
+                        Staff_form_functions.cancel_form();
+                        Table.deselect_all_selected_row();
+                        Popup1.show_message(response.message, 'success');
+                    } else {
+                        Popup1.show_message(response.message, 'error');
+                    }
+                } else {
+                    console.error('Error:', xhr.status);
+                }
+            }
+        };
+        xhr.send(formData);
+    }
+
+    function get_specific_staff_acc_data(id) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+    
+            const requestBody = 'id=' + id + '&action=get_specific_data'; // Serialize array to JSON string
+            xhr.open('POST', '/dfs-store-ms/api/staff_api.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            resolve(response.data);
+                        } else {
+                            reject(response.message || 'An error occurred');
+                        }
+                    } else {
+                        reject('Error occurred while processing your request');
+                    }
+                }
+            };
+    
+            xhr.send(requestBody);
+        });
+    }
+
     return {
-        add_data
+        add_data,
+        update_data,
+        get_specific_staff_acc_data
     }
 })();
 

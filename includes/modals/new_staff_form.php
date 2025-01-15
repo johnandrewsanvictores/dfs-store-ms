@@ -7,6 +7,7 @@
 
         <form action="" method="POST" id="staff-form">
             <div class="input-div">
+                <input type="hidden" name="staff-id" value="" />
                 <label for="name">Name<span>*</span></label>
                 <input type="text" name="name" id="name" placeholder="Enter the name">
             </div>
@@ -35,8 +36,9 @@
             </div>
 
             <div class="password-container">
+                <p id="passw-note"><span>Note</span>: Leave the password blank if not changing!</p>
                 <div class="input-div">
-                    <label for="password">Password<span>*</span></label>
+                    <label for="password">New Password<span>*</span></label>
                     <div class="password-input-div">
                         <input type="password" name="password" id="password" placeholder="Enter the password">
                         <div>
@@ -175,6 +177,17 @@
         font-size: 16px;
         color: var(--font-dark);
         cursor: pointer;
+    }
+
+    #passw-note {
+        grid-column: 1/3;
+        font-size: var(--small);
+        font-style: italic;
+        display: none;
+    }
+
+    #passw-note span {
+        font-weight: 700;
     }
 
     .staff-form-container .form-btn-container {

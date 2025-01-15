@@ -126,12 +126,14 @@ class Staff_Account_Model
             $stmt = $this->pdo->prepare("INSERT INTO staff_acc (staff_id, name, username, phone_number, role, password)
                                      VALUES (:staff_id, :name, :uname, :pnumber, :role, :password)");
 
+            $password_hash = password_hash($password, PASSWORD_BCRYPT);
+
             $stmt->bindParam(':staff_id', $staff_id);
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':uname', $username);
             $stmt->bindParam(':pnumber', $phone_number);
             $stmt->bindParam(':role', $role);
-            $stmt->bindParam(':password', $password);
+            $stmt->bindParam(':password', $password_hash);
 
             $stmt->execute();
 
@@ -170,5 +172,106 @@ class Staff_Account_Model
         } catch (PDOException $e) {
             return "Error generating staff_id: " . $e->getMessage();
         }
+    }
+
+    public function get_staff_acc_data($filters = [])
+    {
+        try {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Base SQL query with dynamic column selection
+            $sql = "SELECT * FROM staff_acc";
+
+            $whereClauses = [];
+            $params = [];
+
+            // Process filters
+            foreach ($filters as $column => $value) {
+                $whereClauses[] = "$column = :$column";
+                $params[":$column"] = $value;
+            }
+
+            if (!empty($whereClauses)) {
+                $sql .= " WHERE " . implode(" AND ", $whereClauses);
+            }
+
+            $sql .= " LIMIT 1";
+
+            $stmt = $this->pdo->prepare($sql);
+
+            foreach ($params as $param => $value) {
+                $stmt->bindValue($param, $value);
+            }
+
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $this->response['success'] = true;
+            $this->response['message'] = "Retrieved";
+            $this->response['data'] = $results;
+
+            return json_encode($this->response);
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error retrieving staff account data: " . $e->getMessage();
+            return json_encode($this->response);
+        }
+    }
+
+    public function update_staff_acc($staff_id, $name, $username, $pnumber, $role, $password)
+    {
+        $sql = "";
+        try {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Check if the business exists
+            $staff_acc_check_stmt = $this->pdo->prepare("SELECT COUNT(*) FROM staff_acc WHERE staff_id = :id");
+            $staff_acc_check_stmt->bindParam(':id', $staff_id);
+            $staff_acc_check_stmt->execute();
+            $staff_exists = $staff_acc_check_stmt->fetchColumn();
+
+            if (!$staff_exists) {
+                $this->response['success'] = false;
+                $this->response['message'] = "Staff ID does not exist. " . $staff_id;
+                return json_encode($this->response);
+            }
+
+
+            $sql = "UPDATE staff_acc 
+                                     SET name = :name, username = :uname, phone_number = :pnumber, 
+                                         role = :role";
+
+            if (!empty($password)) {
+                $sql .= ", password = :password";
+            }
+
+            $sql .= " WHERE staff_id = :staff_id";
+
+            // Update the business table
+            $stmt = $this->pdo->prepare($sql);
+
+            // Bind parameters
+            $stmt->bindParam(':name', $name);
+            $stmt->bindParam(':uname', $username);
+            $stmt->bindParam(':pnumber', $pnumber);
+            $stmt->bindParam(':role', $role);
+            $stmt->bindParam(':staff_id', $staff_id);
+
+            if (!empty($password)) {
+                $password_hash = password_hash($password, PASSWORD_BCRYPT);
+                $stmt->bindParam(':password', $password_hash);
+            }
+
+            // Execute the update statement
+            $stmt->execute();
+
+            $this->response['success'] = true;
+            $this->response['message'] = "$staff_id updated successfully.";
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error updating data: " . $e->getMessage();
+        }
+
+        return json_encode($this->response);
     }
 }

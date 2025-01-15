@@ -91,6 +91,8 @@ const Form_Validation = (function() {
         const password = document.getElementById('password').value.trim();
         const cpassword = document.getElementById('cpassword').value.trim();
 
+        const form_title = document.querySelector(".staff-header-form h5").textContent;
+
         let isValid = true;
 
         clear_error_msg();
@@ -118,17 +120,30 @@ const Form_Validation = (function() {
             isValid = false;
         }
 
-        if (password === '') {
-            show_error('password', 'Please enter a password.');
-            isValid = false;
-        }else if(password.length < 8) {
-            show_error('password', 'Password must be 8 characters.');
-            isValid = false;
-        }else if(password !== cpassword) {
-            show_error('cpassword', 'Password and confirm password doesn\'t match.');
-            isValid = false;
-        }
         
+        if (form_title === "Add New Staff Account") {
+            // Password is required for "Add New Staff Account"
+            if (password === '') {
+                show_error('password', 'Please enter a password.');
+                isValid = false;
+            } else if (password.length < 8) {
+                show_error('password', 'Password must be at least 8 characters.');
+                isValid = false;
+            } else if (password !== cpassword) {
+                show_error('cpassword', 'Password and confirm password doesn\'t match.');
+                isValid = false;
+            }
+        } else if (form_title === "Update Staff Account") {
+            // Password is optional for "Update Staff Account"
+            if (password !== "" && password.length < 8) {
+                show_error('password', 'Password must be at least 8 characters.');
+                isValid = false;
+            } else if (password !== cpassword) {
+                show_error('cpassword', 'Password and confirm password doesn\'t match.');
+                isValid = false;
+            }
+        }
+
 
         return isValid;
     }
@@ -146,7 +161,8 @@ const Form_Validation = (function() {
 
         switch(elementId) {
             case "password":
-                parent = field.parentElement.parentElement;
+                parent = field.parentElement.parentElement.parentElement;
+                errorElement.style.gridColumn = "1/3";
                 break;
             case "cpassword":
                 parent = field.parentElement.parentElement.parentElement;
@@ -187,7 +203,7 @@ const Form_Validation = (function() {
             input.addEventListener('keyup', () => remove_msg_error_el(input.nextElementSibling));
         });
 
-        password_el.addEventListener('keyup', () => remove_msg_error_el(password_el.parentElement.nextElementSibling));
+        password_el.addEventListener('keyup', () => remove_msg_error_el(password_el.parentElement.parentElement.nextElementSibling.nextElementSibling));
 
         cpassword_el.addEventListener('keyup', () => remove_msg_error_el(cpassword_el.parentElement.parentElement.nextElementSibling));
 
