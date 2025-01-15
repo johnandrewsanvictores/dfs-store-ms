@@ -13,7 +13,7 @@
             </li>
 
             <li class="item">
-                <a href="#" class="navlink-active">Staff Management</a>
+                <a href="#" class="navlink-active">Staff Account Management</a>
             </li>
 
             <li class="item">
@@ -284,13 +284,12 @@
     }
 
     .main {
+        padding: 2em;
+        padding-top: calc(2em + 45px);
         position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
+        min-height: 100vh;
         z-index: 100;
-        background: #e7f2fd;
+        background: rgb(250, 250, 248);
     }
 </style>
 

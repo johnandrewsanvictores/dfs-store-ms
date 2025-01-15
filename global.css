@@ -7,6 +7,12 @@
     --font-dark: #555555;
     --font-white: #F2F2F2;
 
+    --input-bg-color: #ECECEC;
+    --primary-hover-color: #d470ae;
+    --green-hover-color: #71f39c;
+    --red-hover-color: rgb(226, 144, 144);
+    --dark-hover-color: rgb(100, 100, 100);
+
     --stroke-grey: #AEAEAE;
 
     --red: #bb5353;
