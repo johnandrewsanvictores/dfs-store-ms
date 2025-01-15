@@ -315,34 +315,3 @@ const Table = (function() {
 })();
 
 
-const Popup1 = (function() {
-    function show_message(msg, icon) {
-        Swal.fire({
-            position: "top right",
-            icon: icon,
-            title: msg,
-            showConfirmButton: false,
-            timer: 1500
-        });
-    }
-
-    function show_confirm_dialog(msg, callback) {
-        Swal.fire({
-            text: msg,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                callback();
-            }
-        });
-    }
-
-    return {
-        show_message,
-        show_confirm_dialog
-    }
-})();

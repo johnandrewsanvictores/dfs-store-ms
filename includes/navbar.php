@@ -1,3 +1,14 @@
+<?php
+require '../includes/connection.php';
+require '../models/Staff_model.php';
+
+session_start();
+$staff_acc_model = new Staff_Account_Model($connection);
+$response = json_decode($staff_acc_model->get_staff_acc_data(['username' => $_SESSION["username"]]));
+
+$login_user_data = $response->data[0];
+?>
+
 <nav class="sidebar">
     <div class="sidebar-header">
         <img src="../assets/images/dfs_logo.jpg" alt="logo">
@@ -105,8 +116,8 @@
 <nav class="navbar">
     <i class="fa-solid fa-bars" id="sidebar-close"></i>
     <div class="user-nav-div">
-        <p>Rhesty Adormeo <span class="role-text-nav">(Admin)</span></p>
-        <i class="fa-solid fa-right-from-bracket"></i>
+        <p><?php echo ucfirst($login_user_data->name); ?> <span class="role-text-nav">(<?php echo ucfirst($login_user_data->role); ?>)</span></p>
+        <i class="fa-solid fa-right-from-bracket" id="logout-btn"></i>
     </div>
 </nav>
 
@@ -261,12 +272,18 @@
         align-items: center;
     }
 
+
+
     .user-nav-div p {
         font-size: var(--body);
     }
 
-    .user-nav-div i {
+    #logout-btn {
         cursor: pointer;
+    }
+
+    #logout-btn:hover {
+        color: var(--tertiary);
     }
 
     .role-text-nav {
@@ -302,6 +319,8 @@
     const menuItems = document.querySelectorAll(".submenu-item");
     const subMenuTitles = document.querySelectorAll(".submenu .menu-title");
 
+    const logout_btn = document.getElementById('logout-btn');
+
     sidebarClose.addEventListener("click", () => sidebar.classList.toggle("close"));
 
     menuItems.forEach((item, index) => {
@@ -321,4 +340,65 @@
             menu.classList.remove("submenu-active");
         });
     });
+
+    logout_btn.addEventListener('click', () => Popup1.show_confirm_dialog("Are you sure you want to logout?", logout));
+
+
+    function logout() {
+        const xhr = new XMLHttpRequest();
+        const requestBody = 'action=logout'; // Define the action for logout
+
+        xhr.open('POST', '/dfs-store-ms/api/logout.php', true); // Point to your PHP logout script
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Parse the response
+                const response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    console.log(response.message); // Optional: Log the message
+                    // Redirect to the login page
+                    window.location.href = '/dfs-store-ms/pages/login.php';
+                } else {
+                    console.error('Logout failed:', response.message);
+                    alert('Error: ' + response.message);
+                }
+            }
+        };
+
+        xhr.send(requestBody); // Send the action to the server
+    }
+
+    const Popup1 = (function() {
+        function show_message(msg, icon) {
+            Swal.fire({
+                position: "top right",
+                icon: icon,
+                title: msg,
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        function show_confirm_dialog(msg, callback) {
+            Swal.fire({
+                text: msg,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    callback();
+                }
+            });
+        }
+
+        return {
+            show_message,
+            show_confirm_dialog
+        }
+    })();
 </script>
