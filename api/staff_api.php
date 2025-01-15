@@ -48,4 +48,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo $response;
         return $response;
     }
+
+    //removing staff account/s
+    if (isset($_POST['action']) && $_POST['action'] === 'remove_data' && isset($_POST['ids'])) {
+        $response = $staff_acc_model->remove_staff_acc('ids');
+
+        echo $response;
+        return $response;
+    }
 }

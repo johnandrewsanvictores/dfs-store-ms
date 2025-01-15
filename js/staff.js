@@ -22,6 +22,32 @@ const Controls = (function() {
     function add_events() {
         new_btn.addEventListener("click", Staff_Form_Main.add_data_event);
         edit_btn.addEventListener("click", Staff_Form_Main.edit_data_event);
+        remove_btn.addEventListener("click", remove_data_event);
+        select_all.addEventListener("click", Table.select_all_rows);
+        deselect_all.addEventListener("click", Table.deselect_all_selected_row);
+
+    }
+
+    function get_selected_ids() {
+        var datas = Table.getSelectedRow(table);
+        var ids = [];
+        for(let i =0; i < datas.length; i++ ) {
+            ids.push(datas[i].id);
+        }
+
+        return ids;
+    }
+
+    function remove_data_event() {
+        const selected_rows = Table.getSelectedRow(table);
+
+        if(selected_rows.length < 1) {
+            Popup1.show_message('Please ensure at least one row is selected.', 'warning') ;
+            return;
+        }
+
+        const ids = get_selected_ids();
+        Popup1.show_confirm_dialog(`Are you sure you want to delete ${selected_rows.length} account/s?`, () => Request_Staff.remove_data(ids));
     }
 
     return {
@@ -166,6 +192,32 @@ const Request_Staff = (function() {
         xhr.send(formData);
     }
 
+    function remove_data(ids) {
+        const xhr = new XMLHttpRequest();
+
+        const requestBody = 'ids=' + JSON.stringify(ids) + `&action=remove_data`;
+        xhr.open('POST', '/dfs-store-ms/api/staff_api.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        Table.deselect_all_selected_row();
+                        table.row('.selected').remove().draw(false);
+                        Popup1.show_message(response.message, 'success');
+                    } else {
+                        Popup1.show_message(response.message, 'error');
+                    }
+                } else {
+                    PopUp.showMessage('Error occurred while processing your request.', 'error');
+                }
+            }
+        };
+        xhr.send(requestBody);
+    }
+
     function get_specific_staff_acc_data(id) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -196,6 +248,7 @@ const Request_Staff = (function() {
     return {
         add_data,
         update_data,
+        remove_data,
         get_specific_staff_acc_data
     }
 })();

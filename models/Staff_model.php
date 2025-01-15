@@ -274,4 +274,34 @@ class Staff_Account_Model
 
         return json_encode($this->response);
     }
+
+    function remove_staff_acc($ids)
+    {
+        $idsArray = json_decode($_POST[$ids], true);
+        $placeholders = [];
+        foreach ($idsArray as $id) {
+            $placeholders[] = '?';
+        }
+        $placeholdersString = implode(',', $placeholders);
+
+        try {
+            $deleteQuery = "DELETE FROM staff_acc WHERE id IN ($placeholdersString)";
+            $deleteStmt = $this->pdo->prepare($deleteQuery);
+            $deleteStmt->execute($idsArray); // Execute with the IDs array
+
+            // Check if the delete was successful
+            if ($deleteStmt->rowCount() > 0) {
+                $this->response['success'] = true;
+                $this->response['message'] = "Staff account/s removed successfully.";
+            } else {
+                $this->response['success'] = false;
+                $this->response['message'] = "No accounts were removed.";
+            }
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error removing account: " . $e->getMessage();
+        }
+
+        return json_encode($this->response);
+    }
 }
