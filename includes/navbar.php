@@ -20,11 +20,11 @@ $login_user_data = $response->data[0];
     <div class="menu-content">
         <ul class="menu-items">
             <li class="item">
-                <a href="#">Dashboard</a>
+                <a href="dashboard.php" class="navlink-active">Dashboard</a>
             </li>
 
             <li class="item">
-                <a href="#" class="navlink-active">Staff Account Management</a>
+                <a href="staff.php">Staff Account Management</a>
             </li>
 
             <li class="item">
@@ -39,10 +39,10 @@ $login_user_data = $response->data[0];
                         Product Classification
                     </div>
                     <li class="item">
-                        <a href="#">Classification</a>
+                        <a href="product_classification.php">Classification</a>
                     </li>
                     <li class="item">
-                        <a href="#">Brand/Category</a>
+                        <a href="category_brand.php">Brand/Category</a>
                     </li>
                 </ul>
             </li>
@@ -59,14 +59,14 @@ $login_user_data = $response->data[0];
                         Supplier
                     </div>
                     <li class="item">
-                        <a href="#">Add Supplier</a>
-                        <a href="#">Supply Order</a>
+                        <a href="supplier.php">Add Supplier</a>
+                        <a href="supply_order.php">Supply Order</a>
                     </li>
                 </ul>
             </li>
 
             <li class="item">
-                <a href="#">Inventory</a>
+                <a href="inventory.php">Inventory</a>
             </li>
 
             <li class="item">
