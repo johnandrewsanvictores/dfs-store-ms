@@ -120,6 +120,13 @@
     <script src="../js/new_staff_form.js"></script>
     <script src="../js/staff.js"></script>
 
+    <script>
+        document.querySelectorAll('nav a').forEach(el => {
+            el.classList.remove("navlink-active");
+        });
+
+        document.querySelector('a[href="staff.php"]').classList.add('navlink-active');
+    </script>
 </body>
 
 </html>
