@@ -38,11 +38,11 @@
 
                 <div class="color-input">
                     <label for="color">Select Color</label>
-                    <input type="color" name="color">
+                    <input type="color" name="color" id="color">
                 </div>
 
             </div>
-            <button type="submit" id="classification-add-btn">Add</button>
+            <button type=" submit" id="classification-add-btn">Add</button>
 
         </form>
     </div>

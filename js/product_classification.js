@@ -26,23 +26,21 @@ const Csf_form_main = (function() {
 
     function add_events() {
         csf_form.addEventListener('submit', submit_data);
+        Form_Validation.rmv_error_msg_on_data_change();
     }
 
     function submit_data(e) {
         e.preventDefault();
 
-        if(form_title.textContent === "Add New Product Property") {
-            Request_Csf.add_data(csf_form);
+        console.log(Form_Validation.validate_csf());
+        if(Form_Validation.validate_csf()){
+            if(form_title.textContent === "Add New Product Property") {
+                Request_Csf.add_data(csf_form);
+            }
+            else if(form_title.textContent === "Update Product Property") {
+                Request_Csf.update_data(csf_form);
+            }
         }
-
-        // if(Form_Validation.validate_staff_information()){
-        //     if(form_title.textContent === "Add New Product Property") {
-        //         Request_Csf.add_data(staff_form);
-        //     }
-        //     else if(form_title.textContent === "Update Product Property") {
-        //         Request_Csf.update_data(staff_form);
-        //     }
-        // }
     }
 
     return {
