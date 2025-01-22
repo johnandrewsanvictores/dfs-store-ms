@@ -1,130 +1,144 @@
-.form-container {
-
-}
-
-#product-property-form {
+.header-classification {
     display: flex;
     flex-direction: column;
     gap: 1em;
-    padding: 1em;
-    width: fit-content;
-    box-shadow: 0px 0px 3px #b6b6b6;
 }
 
-#product-property h6 {
-    color: var(--font-dark);
-}
-
-.form-content {
-    display: flex;
-    gap: 2em;
-}
-
-select {
-    /* Reset Select */
-    appearance: none;
-    outline: 10px red;
-    border: 0;
-    box-shadow: none;
-    /* Personalize */
-    flex: 1;
-    padding: 0 1em;
-    color: var(--font-dark);
-    background-color: var(--white-bg);
-    border: 1px solid var(--stroke-grey);
-    background-image: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-/* Remove IE arrow */
-select::-ms-expand {
-    display: none;
-}
-
-/* Custom Select wrapper */
-.select {
-    position: relative;
-    display: flex;
-    width: 13em;
-    height: 3em;
-    border-radius: .25em;
-    overflow: hidden;
-}
-
-/* Arrow */
-.select::after {
-    content: '\25BC';
-    position: absolute;
-    top: -5px;
-    right: 0;
-    padding: 1em;
-    color: var(--font-white);
-    background-color: var(--font-dark);
-    transition: .25s all ease;
-    pointer-events: none;
-}
-
-/* Transition */
-.select:hover::after {
-    color: var(--secondary);
-}
-
-.form-content .classification-form-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4em;
-}
-
-.color-input {
-    margin-left: -1em;
-    display: flex;
-    gap: 0.5em;
-}
-
-.form-content > div > label {
+#csf-new-btn {
     font-size: var(--small);
-}
-
-#product-property-form input[type="text"] {
-    width: 100%;
-    border-radius: 5px;
-    background-color: var(--input-bg-color);
-    outline: none;
-    border: none;
-    padding: 1em 1.5em;
-    font-size: var(--small);
-    color: inherit;
-    height: 100%;
-}
-
-#product-property-form input[type="color"] {
-    width: 4em;
-    height: 100%;
-    border-radius: 20px;
-    outline: none;
-    border:none;
-}
-
-#classification-add-btn {
     padding: 0.5em 1em;
-    font-family: inherit;
     color: var(--font-white);
-    border-radius: 5px;
-    font-size: var(--body);
-    border: none;
-    outline: none;
     cursor: pointer;
+    outline: none;
+    border: 1px solid var(--stroke-grey);
+    border-radius: 5px;
+    margin-bottom: 1em;
+    font-family: inherit;
     background-color: var(--primary);
-    width: 10em;
+    width: 8em;
 }
 
-#classification-add-btn:hover {
+#csf-new-btn:hover {
     background-color: var(--primary-hover-color);
 }
 
-.property-name , .color-form-container, .color-input {
-    display: none;
-    flex-direction: column;
-    gap: 0.4em;
+.text-table-container {
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#texture-table, #material-table, #color-table {
+    width: 100%;
+    max-width: 800px;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+#texture-table th, #texture-table td,
+#material-table th, #material-table td,
+#color-table th, #color-table td {
+    padding: 0.75em;
+    text-align: left;
+}
+
+#texture-table th, #material-table th, #color-table th {
+    background-color: var(--primary);
+    color: var(--font-white);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#texture-table tbody tr, #material-table tbody tr, #color-table tbody tr {
+    border-bottom: 1px solid var(--stroke-grey);
+}
+
+#texture-table tbody tr:hover, #material-table tbody tr:hover, #color-table tbody tr:hover {
+    background-color: var(--dark-hover-color);
+}
+
+#texture-table tbody tr:nth-child(odd),
+#material-table tbody tr:nth-child(odd),
+#color-table tbody tr:nth-child(odd) {
+    background-color: var(--white-bg);
+}
+
+#texture-table tbody tr:nth-child(even),
+#material-table tbody tr:nth-child(even),
+#color-table tbody tr:nth-child(even) {
+    background-color: var(--input-bg-color);
+}
+
+.edit-btn, .delete-btn {
+    font-size: var(--small);
+    padding: 0.3em 0.6em;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 0.5em;
+}
+
+.edit-btn {
+    background-color: var(--green);
+    color: var(--font-white);
+}
+
+.delete-btn {
+    background-color: var(--red);
+    color: var(--font-white);
+}
+
+.edit-btn:hover {
+    background-color: var(--green-hover-color);
+}
+
+.delete-btn:hover {
+    background-color: var(--red-hover-color);
+}
+
+.table-wrapper {
+    flex: 1;
+    min-width: 300px;
+    margin-bottom: 2em;
+}
+
+.table-wrapper h5 {
+    text-align: center;
+    margin-bottom: 0.5em;
+    background-color: var(--input-bg-color);
+    padding: 0.5em;
+    border-radius: 5px;
+}
+
+.color-preview {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--stroke-grey);
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.color-1 {
+    background-color: var(--primary);
+}
+
+.color-2 {
+    background-color: var(--secondary);
+}
+
+.color-3 {
+    background-color: var(--tertiary);
+}
+
+.color-4 {
+    background-color: var(--dark-bg);
+}
+
+.color-5 {
+    background-color: var(--white-bg);
+}
+
+.color-6 {
+    background-color: var(--font-dark);
 }

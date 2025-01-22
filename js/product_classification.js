@@ -1,62 +1,100 @@
 document.addEventListener("DOMContentLoaded", function() {
-    Form.add_events();
+    Controls.add_events();
+    Csf_form_main.add_events();
 })
 
-const Form = (function () {
-    const classification_select = document.querySelector("#classification-select");
-    const material_container = document.querySelector(".material-container-form");
-    const texture_container = document.querySelector(".texture-container-form");
-    const color_form_container = document.querySelector(".color-form-container");
-    const color_input_container = document.querySelector(".color-input");
-    const color_input = color_input_container.querySelector("input");
-    const color_input_field = document.querySelector(".color-form-container input")
 
-    const form = document.querySelector("#product-property-form");
+const Controls = (function() {
+    const new_btn = document.querySelector("#csf-new-btn");
 
     function add_events() {
-        classification_select.addEventListener('change', classification_change_event);
-        color_input.addEventListener('change', set_hex);
-        color_input_field.addEventListener('keyup', set_color);
-    };
-
-    function classification_change_event() {
-        console.log(classification_select.value);
-        switch(classification_select.value) {
-            case 'texture':
-                hide_inputs();
-                texture_container.style.display = "flex";
-                break;
-
-            case 'material':
-                hide_inputs();
-                material_container.style.display = "flex";
-                break;
-            
-            case 'color':
-                hide_inputs();
-                color_form_container.style.display = "flex";
-                color_input_container.style.display = "flex";
-                break;
-        }
+        new_btn.addEventListener("click", show_form);
     }
 
-    function hide_inputs () {
-        form.reset()
-        material_container.style.display = "none";
-        texture_container.style.display = "none";
-        color_form_container.style.display = "none";
-        color_input_container.style.display = "none";
-    }
-
-    function set_hex() {
-        color_input_field.value = color_input.value;
-    }
-
-    function set_color() {
-        color_input.value = color_input_field.value;
+    function show_form(){
+        Csf_form_functions.show_csf_form();
     }
 
     return {
         add_events
+    }
+})();
+
+const Csf_form_main = (function() {
+    const form_title = document.querySelector("#csf-form-title");
+    const csf_form = document.querySelector("#product-property-form");
+
+    function add_events() {
+        csf_form.addEventListener('submit', submit_data);
+    }
+
+    function submit_data(e) {
+        e.preventDefault();
+
+        if(form_title.textContent === "Add New Product Property") {
+            Request_Csf.add_data(csf_form);
+        }
+
+        // if(Form_Validation.validate_staff_information()){
+        //     if(form_title.textContent === "Add New Product Property") {
+        //         Request_Csf.add_data(staff_form);
+        //     }
+        //     else if(form_title.textContent === "Update Product Property") {
+        //         Request_Csf.update_data(staff_form);
+        //     }
+        // }
+    }
+
+    return {
+        add_events
+    }
+})();
+
+const Request_Csf = (function() {
+
+    function add_data(form) {
+        const formData = new FormData(form);
+        formData.append('action', "add_data")
+
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        Popup1.show_message(response.message, 'success');
+                        Csf_form_functions.reset_form();
+                        Csf_form_functions.cancel_form();
+                    } else {
+                        Popup1.show_message(response.message, 'error');
+                    }
+                } else {
+                    console.error('Error:', xhr.status);
+                }
+            }
+        };
+        xhr.send(formData);
+    }
+
+    function update_data(form) {
+
+    }
+
+    function remove_data(ids) {
+
+    }
+
+    function get_specific_staff_acc_data(id) {
+
+    }
+
+    return {
+        add_data,
+        update_data,
+        remove_data,
+        get_specific_staff_acc_data
     }
 })();
