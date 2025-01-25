@@ -25,286 +25,39 @@
             </button>
         </div>
 
-        <div class="table-container">
-            <div class="text-table-container">
-                <div class="table-wrapper">
-                    <h5>Texture</h5>
-                    <table id="texture-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Texture</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Matte</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Glossy</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Satin</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>Metallic</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>Velvet</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>6</td>
-                                <td>Leather</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="table-wrapper">
-                    <h5>Material</h5>
-                    <table id="material-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Material</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Cotton</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Polyester</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Wool</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>Silk</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>Linen</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>6</td>
-                                <td>Denim</td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="table-wrapper">
-                    <h5>Color</h5>
-                    <table id="color-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Hex Value</th>
-                                <th>Preview</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>#FF5733</td>
-                                <td>
-                                    <div class="color-preview color-1"></div>
-                                </td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>#33FF57</td>
-                                <td>
-                                    <div class="color-preview color-2"></div>
-                                </td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>#3357FF</td>
-                                <td>
-                                    <div class="color-preview color-3"></div>
-                                </td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>#F1C40F</td>
-                                <td>
-                                    <div class="color-preview color-4"></div>
-                                </td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>#8E44AD</td>
-                                <td>
-                                    <div class="color-preview color-5"></div>
-                                </td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>6</td>
-                                <td>#2ECC71</td>
-                                <td>
-                                    <div class="color-preview color-6"></div>
-                                </td>
-                                <td>
-                                    <button class="edit-btn" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-btn" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="category">Category</button>
+            <button class="filter-tab" data-filter="brand">Brand</button>
+            <button class="filter-tab" data-filter="texture">Texture</button>
+            <button class="filter-tab" data-filter="material">Material</button>
+            <button class="filter-tab" data-filter="color">Color</button>
+        </div>
+
+        <div class="title-search-sort-container">
+            <h5 id="list-title">List of Categories</h5>
+            <div class="search-sort-container">
+                <input type="text" id="search-input" placeholder="Search..." class="search-input">
+                <div class="sort-dropdown-container">
+                    <select class="sort-dropdown">
+                        <option value="default">Sort By</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                    </select>
+                    <i class="fas fa-sort"></i>
                 </div>
             </div>
+        </div>
+
+        <button class="remove-selected-btn" id="remove-selected-btn" disabled>Remove selected (0)</button>
+
+        <div class="card-container" id="card-container">
+            <!-- Cards will be dynamically inserted here -->
+        </div>
+
+        <div class="pagination-container">
+            <button class="pagination-button" id="prev-page" disabled>&laquo; Previous</button>
+            <span class="pagination-info">Page 1 of 10</span>
+            <button class="pagination-button" id="next-page">Next &raquo;</button>
         </div>
     </main>
 

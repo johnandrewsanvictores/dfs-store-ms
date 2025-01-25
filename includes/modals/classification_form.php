@@ -12,12 +12,38 @@
                         <div class="select">
                             <select name="classification" id="classification-select">
                                 <option value="" disabled selected>Select an option</option>
+                                <option value="category">Category</option>
+                                <option value="brand">Brand</option>
                                 <option value="texture">Texture</option>
                                 <option value="material">Material</option>
                                 <option value="color">Color</option>
                             </select>
                         </div>
                     </div>
+                </div>
+
+                <div class="property-name category-container-form">
+                    <label for="category">Category Name<span>*</span></label>
+                    <input type="text" name="category" value="" id="category" placeholder="Input category name">
+                    <label for="category-image">Category Image<span>*</span></label>
+                    <input type="file" name="category-image" id="category-image" accept="image/*">
+                    <img id="category-image-preview" src="#" alt="Category Image Preview" style="display:none;" />
+                </div>
+
+                <div class="property-name brand-container-form">
+                    <label for="category-select">Category<span>*</span></label>
+                    <div class="container">
+                        <div class="select">
+                            <select name="category_id" id="category-select">
+                                <option value="" disabled selected>Select a category</option>
+                            </select>
+                        </div>
+                    </div>
+                    <label for="brand">Brand Name<span>*</span></label>
+                    <input type="text" name="brand" value="" id="brand" placeholder="Input brand name">
+                    <label for="brand-image">Brand Image<span>*</span></label>
+                    <input type="file" name="brand-image" id="brand-image" accept="image/*">
+                    <img id="brand-image-preview" src="#" alt="Brand Image Preview" style="display:none;" />
                 </div>
 
                 <div class="property-name texture-container-form">
@@ -33,7 +59,6 @@
                 <div class="color-form-container">
                     <label for="color">Hex Value<span>*</span></label>
                     <input type="text" name="hexvalue" value="" id="hexvalue" placeholder="Input hexvalue or select color">
-
                 </div>
 
                 <div class="color-input">
@@ -42,8 +67,7 @@
                 </div>
 
             </div>
-            <button type=" submit" id="classification-add-btn">Add</button>
-
+            <button type="submit" id="classification-add-btn">Add</button>
         </form>
     </div>
 </div>
@@ -208,6 +232,13 @@
         border: none;
     }
 
+    #product-property-form input[type="file"] {
+        border: 1px solid var(--stroke-grey);
+        border-radius: 5px;
+        padding: 0.5em;
+        cursor: pointer;
+    }
+
     #classification-add-btn {
         padding: 0.5em 1em;
         font-family: inherit;
@@ -227,9 +258,18 @@
 
     .property-name,
     .color-form-container,
-    .color-input {
+    .color-input,
+    .category-container-form,
+    .brand-container-form {
         display: none;
         flex-direction: column;
         gap: 0.4em;
+    }
+
+    .category-container-form img,
+    .brand-container-form img {
+        max-width: 100px;
+        max-height: 100px;
+        margin-top: 10px;
     }
 </style>

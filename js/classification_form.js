@@ -11,9 +11,24 @@ const Form_Dom_Manipulate = (function() {
     const color_input_container = document.querySelector(".color-input");
     const color_input = color_input_container.querySelector("input");
     const color_input_field = document.querySelector(".color-form-container input");
+    
     const texture_el = document.getElementById('texture');
     const material_el = document.getElementById('material');
     const color_el = document.getElementById('hexvalue');
+    const category_el = document.getElementById('category');
+    const brand_el = document.getElementById('brand');
+    const category_image_el = document.getElementById('category-image');
+    const brand_image_el = document.getElementById('brand-image');
+
+
+    const category_container = document.querySelector(".category-container-form");
+    const brand_container = document.querySelector(".brand-container-form");
+    const category_image_input = document.getElementById('category-image');
+    const category_image_preview = document.getElementById('category-image-preview');
+    const brand_image_input = document.getElementById('brand-image');
+    const brand_image_preview = document.getElementById('brand-image-preview');
+
+
 
     const form = document.querySelector("#product-property-form");
 
@@ -21,7 +36,9 @@ const Form_Dom_Manipulate = (function() {
         classification_select.addEventListener('change', classification_change_event);
         color_input.addEventListener('change', set_hex);
         color_input_field.addEventListener('keyup', set_color);
-    };
+        category_image_input.addEventListener('change', preview_image.bind(null, category_image_preview));
+        brand_image_input.addEventListener('change', preview_image.bind(null, brand_image_preview));
+    }
 
     function classification_change_event() {
         const error_msg_el = document.querySelector('.error-message');
@@ -31,7 +48,7 @@ const Form_Dom_Manipulate = (function() {
             }
         }
 
-        [texture_el, material_el, color_el].forEach(input => {
+        [texture_el, material_el, color_el, category_el, brand_el, category_image_el, brand_image_el].forEach(input => {
             input.style.border = '';
         });
 
@@ -54,6 +71,19 @@ const Form_Dom_Manipulate = (function() {
                 color_form_container.style.display = "flex";
                 color_input_container.style.display = "flex";
                 break;
+
+            case 'category':
+                hide_inputs();
+                classification_select.value = "category";
+                category_container.style.display = "flex";
+                break;
+
+            case 'brand':
+                hide_inputs();
+                classification_select.value = "brand";
+                brand_container.style.display = "flex";
+                populate_category_select();
+                break;
         }
     }
 
@@ -63,7 +93,10 @@ const Form_Dom_Manipulate = (function() {
         texture_container.style.display = "none";
         color_form_container.style.display = "none";
         color_input_container.style.display = "none";
-
+        category_container.style.display = "none";
+        brand_container.style.display = "none";
+        category_image_preview.style.display = "none";
+        brand_image_preview.style.display = "none";
     }
 
     function set_hex() {
@@ -72,6 +105,36 @@ const Form_Dom_Manipulate = (function() {
 
     function set_color() {
         color_input.value = color_input_field.value;
+    }
+
+    function preview_image(previewElement, event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewElement.src = e.target.result;
+                previewElement.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function populate_category_select() {
+        fetch('../api/classification_api.php?action=get_all_categories')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const categorySelect = document.getElementById('category-select');
+                    categorySelect.innerHTML = '<option value="" disabled selected>Select a category</option>';
+                    data.categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.category_name;
+                        categorySelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching categories:', error));
     }
 
     return {
@@ -133,12 +196,22 @@ const Form_Validation = (function() {
     const material_el = document.getElementById('material');
     const color_el = document.getElementById('hexvalue');
     const color_input = document.getElementById('color');
+    const category_el = document.getElementById('category');
+    const category_image_el = document.getElementById('category-image');
+    const brand_el = document.getElementById('brand');
+    const brand_image_el = document.getElementById('brand-image');
+    const category_select_el = document.getElementById('category-select')
 
     function validate_csf() {
         const csf_select = csf_select_el.value.trim();
         const texture = texture_el.value.trim();
         const material = material_el.value.trim();
         const color = color_el.value.trim();
+        const category = category_el.value.trim();
+        const category_image = category_image_el.value;
+        const brand = brand_el.value.trim();
+        const brand_image = brand_image_el.value;
+        const category_select = category_select_el.value.trim();
 
         let isValid = true;
 
@@ -167,6 +240,29 @@ const Form_Validation = (function() {
                 show_error('hexvalue', 'Please enter a valid color hex value.');
                 isValid = false;
             }
+        }
+
+        if (csf_select === 'category') {
+            if (category === '') {
+                show_error('category', 'Please enter the category name.');
+                isValid = false;
+            }else if (category_image === '') {
+                show_error('category-image', 'Please select a category image.');
+                isValid = false;
+            }
+        }
+
+        if (csf_select === 'brand') {
+            if (category_select === '') {
+                show_error('category-select', 'Please select a category.');
+                isValid = false;
+            }else if (brand === '') {
+                show_error('brand', 'Please enter the brand name.');
+                isValid = false;
+            }else if (brand_image === '') {
+                show_error('brand-image', 'Please select a brand image.');
+                isValid = false;
+            } 
         }
 
         return isValid;
@@ -202,13 +298,13 @@ const Form_Validation = (function() {
     function clear_error_msg() {
         const errorMessages = document.querySelectorAll('.error-message');
         errorMessages.forEach(error => error.remove());
-        [csf_select_el, texture_el, material_el, color_el].forEach(input => {
+        [csf_select_el, texture_el, material_el, color_el, category_el, category_image_el, brand_el, brand_image_el, category_select_el].forEach(input => {
             input.style.border = '';
         });
     }
 
     function rmv_error_msg_on_data_change() {
-        [material_el, texture_el, color_el].forEach(input => {
+        [material_el, texture_el, color_el, category_el, category_image_el, brand_el, brand_image_el].forEach(input => {
             input.addEventListener('keyup', () => remove_msg_error_el(input));
         });
         color_input.addEventListener('change', () => remove_msg_error_el(color_el));
