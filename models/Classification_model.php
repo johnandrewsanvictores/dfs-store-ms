@@ -86,15 +86,18 @@ class Classification_Model
         return json_encode($this->response);
     }
 
-    public function delete_classification($id)
+    public function delete_classification($ids)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $stmt = $this->pdo->prepare("DELETE FROM classification WHERE id = :id");
-            $stmt->bindParam(':id', $id);
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-            $stmt->execute();
+            // Prepare the delete statement
+            $deleteCsfStmt = $this->pdo->prepare("DELETE FROM classification WHERE id IN ($placeholders)");
+
+            // Bind the parameters
+            $deleteCsfStmt->execute($ids);
 
             $this->response['success'] = true;
             $this->response['message'] = "Classification deleted successfully.";
@@ -106,30 +109,49 @@ class Classification_Model
         return json_encode($this->response);
     }
 
-    public function delete_category_with_brands($category_id)
+    public function delete_category_with_brands($category_ids)
     {
         try {
+            $this->pdo->beginTransaction();
+
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Count the number of brands under this category
-            $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM brand WHERE category_id = :category_id");
-            $countStmt->bindParam(':category_id', $category_id);
-            $countStmt->execute();
-            $brandCount = $countStmt->fetchColumn();
+            $placeholders = implode(',', array_fill(0, count($category_ids), '?'));
 
-            // Delete brands under this category
-            $deleteBrandsStmt = $this->pdo->prepare("DELETE FROM brand WHERE category_id = :category_id");
-            $deleteBrandsStmt->bindParam(':category_id', $category_id);
-            $deleteBrandsStmt->execute();
+            // Get the category images
+            $getCategoryImagesStmt = $this->pdo->prepare("SELECT image_path FROM category WHERE id IN ($placeholders)");
+            $getCategoryImagesStmt->execute($category_ids);
+            $categoryImages = $getCategoryImagesStmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // Delete the category
-            $deleteCategoryStmt = $this->pdo->prepare("DELETE FROM category WHERE id = :category_id");
-            $deleteCategoryStmt->bindParam(':category_id', $category_id);
-            $deleteCategoryStmt->execute();
+            // Unlink the category images
+            foreach ($categoryImages as $image) {
+                if (file_exists("../" . $image)) {
+                    unlink("../" . $image);
+                }
+            }
+
+            // Get the brand images under the categories
+            $getBrandImagesStmt = $this->pdo->prepare("SELECT image_path FROM brand WHERE category_id IN ($placeholders)");
+            $getBrandImagesStmt->execute($category_ids);
+            $brandImages = $getBrandImagesStmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // Unlink the brand images
+            foreach ($brandImages as $image) {
+                if (file_exists("../" . $image)) {
+                    unlink("../" . $image);
+                }
+            }
+
+            // Delete the categories
+            $deleteCategoryStmt = $this->pdo->prepare("DELETE FROM category WHERE id IN ($placeholders)");
+            $deleteCategoryStmt->execute($category_ids);
+
+            $this->pdo->commit();
 
             $this->response['success'] = true;
-            $this->response['message'] = "Category and its $brandCount brands deleted successfully.";
+            $this->response['message'] = "Category and its brands deleted successfully.";
         } catch (PDOException $e) {
+            $this->pdo->rollBack();
             $this->response['success'] = false;
             $this->response['message'] = "Error deleting category: " . $e->getMessage();
         }
@@ -137,19 +159,39 @@ class Classification_Model
         return json_encode($this->response);
     }
 
-    public function delete_brand($brand_id)
+    public function delete_brand($ids)
     {
         try {
+            $this->pdo->beginTransaction();
+
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $stmt = $this->pdo->prepare("DELETE FROM brand WHERE id = :id");
-            $stmt->bindParam(':id', $brand_id);
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-            $stmt->execute();
+            // Get the category images
+            $getBrandImagesStmt = $this->pdo->prepare("SELECT image_path FROM brand WHERE id IN ($placeholders)");
+            $getBrandImagesStmt->execute($ids);
+            $brandImages = $getBrandImagesStmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // Unlink the category images
+            foreach ($brandImages as $image) {
+                if (file_exists("../" . $image)) {
+                    unlink("../" . $image);
+                }
+            }
+
+            // Prepare the delete statement
+            $deleteBrandStmt = $this->pdo->prepare("DELETE FROM brand WHERE id IN ($placeholders)");
+
+            // Bind the parameters
+            $deleteBrandStmt->execute($ids);
+
+            $this->pdo->commit();
 
             $this->response['success'] = true;
             $this->response['message'] = "Brand deleted successfully.";
         } catch (PDOException $e) {
+            $this->pdo->rollBack();
             $this->response['success'] = false;
             $this->response['message'] = "Error deleting brand: " . $e->getMessage();
         }
@@ -163,17 +205,11 @@ class Classification_Model
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             if ($classification == 'category') {
-                foreach ($ids as $id) {
-                    $this->delete_category_with_brands($id);
-                }
+                $this->delete_category_with_brands($ids);
             } elseif ($classification == 'brand') {
-                foreach ($ids as $id) {
-                    $this->delete_brand($id);
-                }
+                $this->delete_brand($ids);
             } else {
-                foreach ($ids as $id) {
-                    $this->delete_classification($id);
-                }
+                $this->delete_classification($ids);
             }
 
             $this->response['success'] = true;

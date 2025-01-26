@@ -120,13 +120,13 @@ const Form_Dom_Manipulate = (function() {
     }
 
     function populate_category_select() {
-        fetch('../api/classification_api.php?action=get_all_categories')
+        fetch('../api/classification_api.php?action=get_all_categorys')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const categorySelect = document.getElementById('category-select');
                     categorySelect.innerHTML = '<option value="" disabled selected>Select a category</option>';
-                    data.categories.forEach(category => {
+                    data.categorys.forEach(category => {
                         const option = document.createElement('option');
                         option.value = category.id;
                         option.textContent = category.category_name;
