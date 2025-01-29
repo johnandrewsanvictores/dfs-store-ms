@@ -7,6 +7,17 @@
     --font-dark: #555555;
     --font-white: #F2F2F2;
 
+    --input-bg-color: #ECECEC;
+    --primary-hover-color: #d470ae;
+    --green-hover-color: #71f39c;
+    --red-hover-color: rgb(226, 144, 144);
+    --dark-hover-color: rgb(100, 100, 100);
+
+    --stroke-grey: #AEAEAE;
+
+    --red: #bb5353;
+    --green: #5eda6e;
+
     --h1: 3.8125rem;
     --h2: 3.05rem;
     --h3: 2.44375rem;
@@ -30,7 +41,7 @@ img {
 
 h1, h2, h3, h4, h5, h6 {
     color: var(--primary);
-    font-family: "Josefin Sans", serif;
+    font-family: "Josefin Sans", sans-serif;
     font-weight: 700;
 }
 
@@ -61,7 +72,7 @@ h6 {
 body {
     color: var(--font-dark);
     font-size: var(--body);
-    font-family: "Libre Baskerville", serif;
+    font-family: "Libre Baskerville", sans-serif;
     font-weight: 400;
     line-height: 1.6;
 }
