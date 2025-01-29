@@ -30,11 +30,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($action == "update_data") {
+        if ($_POST['classification'] == 'category') {
+            $old_img = $_POST['old_img_src'];
+
+            if ($_FILES['category-image']['name']) {
+                $uploadDir = 'assets/uploads/category/'; // Ensure this directory exists
+
+                // Get the original file extension
+                $fileExtension = pathinfo($_FILES['category-image']['name'], PATHINFO_EXTENSION);
+
+                // Generate a unique file name using a combination of a timestamp and the original file extension
+                $uniqueFilename = uniqid('category', true) . '.' . $fileExtension;
+                $targetFile = $uploadDir . $uniqueFilename;
+
+                if (move_uploaded_file($_FILES['category-image']['tmp_name'], '../' . $targetFile)) {
+                    $pic = $targetFile;
+
+                    if (file_exists('../' . $old_img)) {
+                        unlink('../' . $old_img); // Delete the image file
+                    }
+                }
+            } else {
+                $pic = $old_img;
+            }
+            $name = $_POST['category'];
+        } else if ($_POST["classification"] == 'brand') {
+            $old_img = $_POST['old_img_src'];
+
+            if ($_FILES['brand-image']['name']) {
+                $uploadDir = 'assets/uploads/brand/'; // Ensure this directory exists
+
+                // Get the original file extension
+                $fileExtension = pathinfo($_FILES['brand-image']['name'], PATHINFO_EXTENSION);
+
+                // Generate a unique file name using a combination of a timestamp and the original file extension
+                $uniqueFilename = uniqid('brand', true) . '.' . $fileExtension;
+                $targetFile = $uploadDir . $uniqueFilename;
+
+                if (move_uploaded_file($_FILES['brand-image']['tmp_name'], '../' . $targetFile)) {
+                    $pic = $targetFile;
+
+                    if (file_exists('../' . $old_img)) {
+                        unlink('../' . $old_img); // Delete the image file
+                    }
+                }
+            } else {
+                $pic = $old_img;
+            }
+            $name = $_POST['brand'];
+        } else {
+            $name = $_POST['texture'] ?? $_POST['material'] ?? null;
+            $pic = null;
+        }
         $id = $_POST['id'];
         $classification = $_POST['classification'];
-        $name = $_POST['name'];
         $hex_value = $_POST['hexvalue'] ?? null;
-        $response = $classification_model->update_classification($id, $classification, $name, $hex_value);
+        $category_id = $_POST['category_id'] ?? null;
+        $response = $classification_model->update_classification($id, $classification, $name, $hex_value, $category_id, $pic);
         echo $response;
         exit();
     }
@@ -49,6 +101,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action'])) {
+
+    if ($_GET['action'] == "get_specific_data") {
+        $id = $_GET['id'];
+        $classification = $_GET['classification'];
+
+        // Fetch business data
+        $response = $classification_model->get_specific_classification($classification, $id);
+        // $response = $workerModel->getWorkers($filters = ['name' => 'j', 'education_level' => 'undergraduate'], $orderBy = 'worker.name', $orderDir = 'DESC', $limit = -1, $offset = 0);
+
+        echo $response;
+        exit();
+    }
+
     if ($_GET['action'] == "get_all") {
         $response = $classification_model->get_all_classifications();
         echo $response;

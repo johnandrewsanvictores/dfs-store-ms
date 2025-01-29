@@ -28,6 +28,9 @@ const Form_Dom_Manipulate = (function() {
     const brand_image_input = document.getElementById('brand-image');
     const brand_image_preview = document.getElementById('brand-image-preview');
 
+    const hidden_id = document.querySelector("#hidden-id");
+    const hidden_csf = document.querySelector("#hidden-csf");
+
 
 
     const form = document.querySelector("#product-property-form");
@@ -40,8 +43,10 @@ const Form_Dom_Manipulate = (function() {
         brand_image_input.addEventListener('change', preview_image.bind(null, brand_image_preview));
     }
 
-    function classification_change_event() {
+    function classification_change_event(classification) {
         const error_msg_el = document.querySelector('.error-message');
+        const classification_v = classification.type === "change"  ?  classification_select.value : classification;
+        console.log(classification_v);
         if (error_msg_el) {
             if (error_msg_el.className === 'error-message') {
                 error_msg_el.remove();
@@ -52,7 +57,7 @@ const Form_Dom_Manipulate = (function() {
             input.style.border = '';
         });
 
-        switch (classification_select.value) {
+        switch (classification_v) {
             case 'texture':
                 hide_inputs();
                 classification_select.value = "texture";
@@ -89,6 +94,8 @@ const Form_Dom_Manipulate = (function() {
 
     function hide_inputs() {
         form.reset()
+        hidden_id.value = "";
+        hidden_csf.value = "";
         material_container.style.display = "none";
         texture_container.style.display = "none";
         color_form_container.style.display = "none";
@@ -119,7 +126,7 @@ const Form_Dom_Manipulate = (function() {
         }
     }
 
-    function populate_category_select() {
+    function populate_category_select(brand_category_id = null) {
         fetch('../api/classification_api.php?action=get_all_categorys')
             .then(response => response.json())
             .then(data => {
@@ -132,6 +139,10 @@ const Form_Dom_Manipulate = (function() {
                         option.textContent = category.category_name;
                         categorySelect.appendChild(option);
                     });
+
+                    if (brand_category_id) {
+                        categorySelect.value = brand_category_id;
+                    }
                 }
             })
             .catch(error => console.error('Error fetching categories:', error));
@@ -139,11 +150,14 @@ const Form_Dom_Manipulate = (function() {
 
     return {
         add_events,
-        hide_inputs
+        classification_change_event,
+        hide_inputs,
+        populate_category_select
     }
 })();
 
 const Csf_form_functions = (function() {
+    const classification_select = document.querySelector("#classification-select");
     const csf_form_wrapper = document.querySelector(".csf-form-wrapper");
     const csf_form_container = document.querySelector(".csf-form-container");
 
@@ -164,6 +178,9 @@ const Csf_form_functions = (function() {
 
         Form_Dom_Manipulate.hide_inputs();
         Form_Validation.clear_error_msg();
+
+        classification_select.disabled = false;
+
     }
 
     function reset_form() {
@@ -201,6 +218,8 @@ const Form_Validation = (function() {
     const brand_el = document.getElementById('brand');
     const brand_image_el = document.getElementById('brand-image');
     const category_select_el = document.getElementById('category-select')
+
+    const submit_btn = document.querySelector('#classification-add-btn');
 
     function validate_csf() {
         const csf_select = csf_select_el.value.trim();
@@ -246,7 +265,7 @@ const Form_Validation = (function() {
             if (category === '') {
                 show_error('category', 'Please enter the category name.');
                 isValid = false;
-            }else if (category_image === '') {
+            }else if (category_image === '' && submit_btn.textContent === 'Add') {
                 show_error('category-image', 'Please select a category image.');
                 isValid = false;
             }
@@ -259,7 +278,7 @@ const Form_Validation = (function() {
             }else if (brand === '') {
                 show_error('brand', 'Please enter the brand name.');
                 isValid = false;
-            }else if (brand_image === '') {
+            }else if (brand_image === '' && submit_btn.textContent === 'Add') {
                 show_error('brand-image', 'Please select a brand image.');
                 isValid = false;
             } 

@@ -5,6 +5,8 @@
             <i class="fa-solid fa-xmark" id="x-csf-form-btn"></i>
         </div>
         <form action="#" method="Post" id="product-property-form">
+            <input type="hidden" name="id" id="hidden-id">
+            <input type="hidden" name="classification" id="hidden-csf">
             <div class="form-content">
                 <div class="classification-form-container">
                     <label for="role">Classification<span>*</span></label>

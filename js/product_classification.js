@@ -1,3 +1,5 @@
+var old_img = null;
+
 document.addEventListener("DOMContentLoaded", function() {
     ProductClassification.init();
     Controls.add_events();
@@ -103,6 +105,9 @@ const ProductClassification = (function() {
             });
         });
 
+        const edit_btn = card.querySelector('.edit-btn');
+        edit_btn.addEventListener('click', Csf_form_main.update_data_event)
+
         return card;
     }
 
@@ -149,7 +154,6 @@ const ProductClassification = (function() {
     }
 
     function delete_items(classification, ids) {
-        console.log('Deleting items:', classification, );
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -179,11 +183,7 @@ const Controls = (function() {
     const new_btn = document.querySelector("#csf-new-btn");
 
     function add_events() {
-        new_btn.addEventListener("click", show_form);
-    }
-
-    function show_form() {
-        Csf_form_functions.show_csf_form();
+        new_btn.addEventListener("click", Csf_form_main.add_data_event);
     }
 
     return {
@@ -194,33 +194,116 @@ const Controls = (function() {
 const Csf_form_main = (function() {
     const form_title = document.querySelector("#csf-form-title");
     const csf_form = document.querySelector("#product-property-form");
+    const submit_btn = document.querySelector("#classification-add-btn");
 
     function add_events() {
         csf_form.addEventListener('submit', submit_data);
         Form_Validation.rmv_error_msg_on_data_change();
     }
 
+    function add_data_event() {
+        form_title.textContent = "Add New Product Property";
+        submit_btn.textContent = "Add";
+        Csf_form_functions.show_csf_form();
+    }
+
+    async function update_data_event(e) {
+        let target = e.target;
+        if (target.tagName.toLowerCase() === 'i') {
+            target = target.parentElement;
+        }
+        const [classification, id] = target.id.split('-');
+        form_title.textContent = "Update Product Property";
+        submit_btn.textContent = "Update";
+        const data = await Request_Csf.get_specific_csf_data(classification, id);
+
+        Form_Dom_Manipulate.classification_change_event(classification);
+        Csf_form_functions.show_csf_form();
+
+        fill_form(data);
+    }
+
     function submit_data(e) {
         e.preventDefault();
 
         if (Form_Validation.validate_csf()) {
+            const classification = document.querySelector("#classification-select").value;
             if (form_title.textContent === "Add New Product Property") {
-                Request_Csf.add_data(csf_form);
+                Request_Csf.add_data(csf_form, classification);
             } else if (form_title.textContent === "Update Product Property") {
-                Request_Csf.update_data(csf_form);
+                Request_Csf.update_data(csf_form, classification);
             }
         }
     }
+    
+    function fill_form(data) {
+        const classification_select = document.querySelector("#classification-select");
+        const color_input_field = document.querySelector(".color-form-container input");
+        
+        const texture_el = document.getElementById('texture');
+        const material_el = document.getElementById('material');
+        const color_el = document.getElementById('hexvalue');
+        const category_el = document.getElementById('category');
+        const brand_el = document.getElementById('brand');
+
+        const category_image_preview = document.getElementById('category-image-preview');
+        const brand_image_preview = document.getElementById('brand-image-preview');
+
+        const hidden_id = document.querySelector("#hidden-id");
+        const hidden_csf = document.querySelector("#hidden-csf");
+
+        const category_select_el = document.getElementById('category-select');
+
+        var data = data[0];
+
+        switch (classification_select.value) {
+            case 'texture':
+                texture_el.value = data.texture_name;
+                break;
+
+            case 'material':
+                material_el.value = data.material_name;
+                break;
+
+            case 'color':
+                color_el.value = data.hex_value;
+                color_input_field.value = data.hex_value;
+                break;
+
+            case 'category':
+                category_el.value = data.category_name;
+                category_image_preview.src =  "../" +  data.image_path;
+                category_image_preview.style.display = 'block';
+                break;
+
+            case 'brand':
+                Form_Dom_Manipulate.populate_category_select(data.category_id)
+                brand_el.value = data.brand_name;
+                brand_image_preview.src = "../" + data.image_path;
+                brand_image_preview.style.display = 'block';
+                break;
+        }
+
+        classification_select.disabled = true;
+        hidden_id.value = data.id;
+        hidden_csf.value = classification_select.value;
+
+        old_img = data.image_path;
+    }
 
     return {
-        add_events
+        add_events,
+        update_data_event,
+        add_data_event
     };
 })();
 
 const Request_Csf = (function() {
-    function add_data(form) {
+    function add_data(form, classification) {
         const formData = new FormData(form);
         formData.append('action', "add_data");
+        formData.append('classification', classification);
+    
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -232,7 +315,7 @@ const Request_Csf = (function() {
                         Popup1.show_message(response.message, 'success');
                         Csf_form_functions.reset_form();
                         Csf_form_functions.cancel_form();
-                        ProductClassification.load_classifications(formData.get('classification'));
+                        ProductClassification.load_classifications(classification);
                     } else {
                         Popup1.show_message(response.message, 'error');
                     }
@@ -244,13 +327,63 @@ const Request_Csf = (function() {
         xhr.send(formData);
     }
 
-    function update_data(form) {
-        // Implement update data logic
+    function update_data(form, classification) {
+        const formData = new FormData(form);
+        formData.append('action', 'update_data');
+        formData.append('old_img_src', old_img);
+        formData.append('classification', classification);
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        Popup1.show_message(response.message, 'success');
+                        Csf_form_functions.reset_form();
+                        Csf_form_functions.cancel_form();
+                        ProductClassification.load_classifications(classification);
+                    } else {
+                        Popup1.show_message(response.message, 'error');
+                    }
+                } else {
+                    console.error('Error:', xhr.status);
+                }
+            }
+        };
+        xhr.send(formData);
+    }
+
+    function get_specific_csf_data(classification, id) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            const url = `/dfs-store-ms/api/classification_api.php?action=get_specific_data&id=${id}&classification=${classification}`;
+            xhr.open('GET', url, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            resolve(response.data);
+                        } else {
+                            reject(response.message || 'An error occurred');
+                        }
+                    } else {
+                        reject('Error occurred while processing your request');
+                    }
+                }
+            };
+            xhr.send();
+        });
     }
 
     return {
         add_data,
         update_data,
+        get_specific_csf_data,
         delete_items: ProductClassification.delete_items
     };
 })();

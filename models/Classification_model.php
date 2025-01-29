@@ -63,17 +63,41 @@ class Classification_Model
         return json_encode($this->response);
     }
 
-    public function update_classification($id, $classification, $name, $hex_value = null)
+    public function update_classification($id, $classification, $name, $hex_value = null, $category_id = null, $picture = null)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            if ($classification === "category") {
+                $stmt = $this->pdo->prepare("UPDATE category SET category_name = :name, image_path = :img WHERE id = :id");
+                $stmt->bindParam(':img', $picture);
+                $stmt->bindParam(':name', $name);
+            } else if ($classification === "brand") {
+                $stmt = $this->pdo->prepare("UPDATE brand SET brand_name = :name, image_path = :img, category_id = :category_id WHERE id = :id");
+                $stmt->bindParam(':img', $picture);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':category_id', $category_id);
+            } else {
+                $column_name = '';
+                if ($classification == 'brand') {
+                    $column_name = 'brand_name';
+                } elseif ($classification == 'texture') {
+                    $column_name = 'texture_name';
+                } elseif ($classification == 'color') {
+                    $column_name = '';
+                } else {
+                    throw new Exception("Invalid classification type");
+                }
 
-            $stmt = $this->pdo->prepare("UPDATE classification SET classification = :classification, name = :name, hex_value = :hex_value WHERE id = :id");
-            $stmt->bindParam(':classification', $classification);
-            $stmt->bindParam(':name', $name);
-            $stmt->bindParam(':hex_value', $hex_value);
+                if ($column_name) {
+                    $stmt = $this->pdo->prepare("UPDATE classification SET $column_name = :name, hex_value = :hex_value WHERE id = :id");
+                    $stmt->bindParam(':name', $name);
+                } else {
+                    $stmt = $this->pdo->prepare("UPDATE classification SET hex_value = :hex_value WHERE id = :id");
+                }
+
+                $stmt->bindParam(':hex_value', $hex_value);
+            }
             $stmt->bindParam(':id', $id);
-
             $stmt->execute();
 
             $this->response['success'] = true;
@@ -460,5 +484,64 @@ class Classification_Model
         }
 
         return json_encode($this->response);
+    }
+
+    public function get_specific_classification($classification, $id)
+    {
+        if ($classification === "category") {
+            try {
+                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                $stmt = $this->pdo->prepare("SELECT * FROM category WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $this->response['success'] = true;
+                $this->response['data'] = $results;
+            } catch (PDOException $e) {
+                $this->response['success'] = false;
+                $this->response['message'] = "Error retrieving categories: " . $e->getMessage();
+            }
+
+            return json_encode($this->response);
+        } else if ($classification === "brand") {
+            try {
+                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                $stmt = $this->pdo->prepare("SELECT * FROM brand WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $this->response['success'] = true;
+                $this->response['data'] = $results;
+            } catch (PDOException $e) {
+                $this->response['success'] = false;
+                $this->response['message'] = "Error retrieving brand: " . $e->getMessage();
+            }
+
+            return json_encode($this->response);
+        } else {
+            try {
+                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                $stmt = $this->pdo->prepare("SELECT * FROM classification WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $this->response['success'] = true;
+                $this->response['data'] = $results;
+            } catch (PDOException $e) {
+                $this->response['success'] = false;
+                $this->response['message'] = "Error retrieving brand: " . $e->getMessage();
+            }
+
+            return json_encode($this->response);
+        }
     }
 }
