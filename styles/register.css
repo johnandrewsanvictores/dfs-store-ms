@@ -1,167 +1,432 @@
-body {
-    font-family: "Libre Baskerville", sans-serif;
-    background-color: var(--white-bg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-}
-
 .register-page {
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
+    justify-content: center;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding-top: calc(70px + 1em);
+    box-sizing: border-box;
 }
 
 .register-container {
     display: flex;
-    flex-direction: row;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    width: 80%;
-    max-width: 1000px;
-    transform: scale(1);
-    transition: transform 0.3s ease;
+    background: var(--white-bg);
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+    width: 1200px;
+    max-width: 100%;
+    min-height: 600px;
+    position: relative;
 }
 
-.register-container:hover {
-    transform: scale(1.05);
-}
-
-.register-image {
+.register-left {
     flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--primary);
-    padding: 20px;
-}
-
-.register-image img {
-    width: 80%;
-    height: auto;
-    border-radius: 10px;
-}
-
-.register-form {
-    flex: 1;
-    padding: 40px;
+    background: linear-gradient(135deg, var(--tertiary) 0%, var(--white-bg) 100%);
+    padding: 4rem 3rem;
+    color: var(--font-dark);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    justify-content: flex-start;
+    gap: 1.5rem;
+    position: relative;
+    text-align: left;
 }
 
-.register-form h2 {
-    margin-bottom: 25px;
+.register-left h1 {
+    font-size: var(--h2);
+    line-height: 1.2;
+    font-family: "Josefin Sans", serif;
+    color: var(--primary);
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
+    max-width: 80%;
+    margin-left: 3rem;
+}
+
+.register-left p {
+    font-size: var(--h6);
+    line-height: 1.5;
     color: var(--font-dark);
-    font-size: var(--h4);
-    text-align: center;
-    font-family: "Lobster", serif;
+    position: relative;
+    z-index: 2;
+    max-width: 70%;
+    margin-left: 3rem;
 }
 
-.register-form .form-group {
-    margin-bottom: 15px;
+.illustration {
+    position: absolute;
+    left: -200px;
+    bottom: -20px;
+    width: 500px;
+    height: auto;
+    z-index: 1;
+    opacity: 0.9;
 }
 
-.register-form input[type="text"],
-.register-form input[type="email"],
-.register-form input[type="password"] {
+.illustration img {
     width: 100%;
-    padding: 15px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+}
+
+.register-left::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    right: 10%;
+    width: 120px;
+    height: 120px;
+    background: var(--tertiary);
+    border-radius: 50%;
+    opacity: 0.2;
+    z-index: 0;
+}
+
+.register-left::after {
+    content: '';
+    position: absolute;
+    bottom: 15%;
+    right: 25%;
+    width: 80px;
+    height: 80px;
+    background: var(--primary);
+    border-radius: 50%;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.register-right {
+    flex: 1;
+    padding: 2rem;
+    background: var(--white-bg);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.register-form-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.register-form-container h2 {
+    color: var(--primary);
+    font-size: var(--h4);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--font-dark);
+    margin-bottom: 2rem;
+    font-size: var(--small);
+}
+
+.form-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    align-items: center;
+}
+
+.input-with-button input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem;
     border: 1px solid var(--stroke-grey);
     border-radius: 8px;
-    box-sizing: border-box;
-    font-size: var(--body);
 }
 
-.register-form .otp-group {
-    display: flex;
-    gap: 10px;
-}
-
-.register-form .otp-button {
-    padding: 15px;
-    background-color: var(--secondary);
-    border: none;
+.otp-btn {
+    padding: 0.6rem 1rem;
+    background: var(--white-bg);
+    border: 1px solid var(--primary);
+    color: var(--primary);
     border-radius: 8px;
-    color: var(--font-white);
-    font-size: var(--small);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    min-width: 90px;
+    font-weight: 500;
 }
 
-.register-form .otp-button:hover {
-    background-color: var(--primary-hover-color);
+.otp-btn:hover {
+    background: var(--primary);
+    color: var(--white-bg);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(236, 0, 140, 0.2);
 }
 
-.register-form button {
+.otp-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(236, 0, 140, 0.2);
+}
+
+/* Optional: Add disabled state */
+.otp-btn:disabled {
+    background: var(--stroke-grey);
+    border-color: var(--stroke-grey);
+    color: var(--font-light);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--font-dark);
+    font-size: var(--small);
+}
+
+.form-group input {
     width: 100%;
-    padding: 15px;
-    background-color: var(--primary);
-    border: none;
+    padding: 0.6rem;
+    border: 1px solid var(--stroke-grey);
     border-radius: 8px;
-    color: var(--font-white);
-    font-size: var(--body);
+    background: var(--input-bg-color);
+    color: var(--font-dark);
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: var(--primary);
+    outline: none;
+    background: var(--white-bg);
+}
+
+.password-input {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    color: var(--font-dark);
 }
 
-.register-form button:hover {
-    background-color: var(--primary-hover-color);
-    transform: translateY(-3px);
-}
-
-.register-form .login-link {
-    margin-top: 20px;
-    text-align: center;
+.terms {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
     font-size: var(--small);
 }
 
-.register-form .login-link a {
+.terms input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.terms label {
+    margin: 0;
+    color: var(--font-dark);
+}
+
+.terms a {
+    color: var(--primary);
+    text-decoration: none;
+    margin-left: 0.25rem;
+}
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+.register-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary);
+    color: var(--font-white);
+    border: none;
+    border-radius: 8px;
+    font-size: var(--body);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.register-btn:hover {
+    background: var(--primary-hover-color);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: var(--small);
+}
+
+.login-link a {
     color: var(--primary);
     text-decoration: none;
 }
 
-.register-form .login-link a:hover {
-    text-decoration: underline;
+/* Responsive breakpoints */
+@media (max-width: 1200px) {
+    .register-container {
+        width: 95%;
+    }
+
+    .illustration {
+        width: 450px;
+        left: -150px;
+    }
+}
+
+@media (max-width: 968px) {
+    .register-page {
+        padding: 0.5em;
+        padding-top: calc(70px + 0.5em);
+    }
+    
+    .register-container {
+        flex-direction: column;
+        min-height: auto;
+        width: 100%;
+    }
+
+    .register-left {
+        padding: 2rem 1.5rem;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .register-left h1 {
+        font-size: var(--h3);
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .register-left p {
+        font-size: var(--body);
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .illustration {
+        position: relative;
+        width: 100%;
+        max-width: 300px;
+        margin: 1rem auto;
+        left: auto;
+        bottom: auto;
+    }
+
+    .register-right {
+        padding: 1.5rem;
+        width: 100%;
+    }
+
+    .register-form-container {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .input-with-button {
+        gap: 0.3rem;
+    }
+
+    .otp-btn {
+        padding: 0.6rem 0.8rem;
+        font-size: var(--small);
+    }
 }
 
 @media (max-width: 768px) {
     .register-container {
-        flex-direction: column;
-        width: 100%;
-        transform: none;
+        border-radius: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-container {
+        border-radius: 10px;
     }
 
-    .register-container:hover {
-        transform: none;
+    .register-left {
+        padding: 1.5rem 1rem;
     }
 
-    .register-image {
-        padding: 20px;
+    .register-left h1 {
+        font-size: var(--h4);
     }
 
-    .register-image img {
-        width: 100%;
-        height: auto;
+    .register-left p {
+        font-size: var(--small);
     }
 
-    .register-form {
-        padding: 30px;
+    .illustration {
+        max-width: 250px;
     }
 
-    .register-form .otp-group {
-        flex-direction: column;
+    .register-right {
+        padding: 1rem;
     }
 
-    .register-form .otp-button {
-        width: 100%;
+    .form-group label {
+        font-size: var(--small);
+    }
+
+    .form-group input {
+        padding: 0.5rem;
+        font-size: var(--small);
+    }
+
+    .terms {
+        font-size: var(--tiny);
+    }
+
+    .register-btn {
+        padding: 0.6rem;
+        font-size: var(--small);
+    }
+
+    .input-with-button {
+        gap: 0.3rem;
+    }
+
+    .otp-btn {
+        padding: 0.6rem 0.6rem;
+        font-size: var(--tiny);
+        min-width: 80px;
+    }
+}
+
+/* Handle very small screens */
+@media (max-width: 360px) {
+    .register-left {
+        padding: 1rem 0.75rem;
+    }
+
+    .register-right {
+        padding: 0.75rem;
+    }
+
+    .illustration {
+        max-width: 200px;
     }
 }

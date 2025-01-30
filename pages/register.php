@@ -18,41 +18,80 @@
 
     <div class="register-page">
         <div class="register-container">
-            <div class="register-image" style="background-color: #f0f0f0;">
-                <img src="../assets/images/main/signup.svg" alt="E-commerce Image">
+            <div class="register-left">
+                <h1>Let's Make it Happen Together!</h1>
+                <p>Join our fashion community and discover amazing styles</p>
+                <div class="illustration">
+                    <img src="../assets/images/main/rgs.svg" alt="Registration Illustration">
+                </div>
             </div>
-            <div class="register-form">
-                <h2>Register</h2>
-                <form action="register_process.php" method="post">
-                    <div class="form-group">
-                        <input type="text" name="username" placeholder="Username" required>
-                    </div>
-                    <div class="form-group otp-group">
-                        <input type="email" name="email" placeholder="Email" required>
-                        <button type="button" class="otp-button">Send OTP</button>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" name="email_otp" placeholder="Enter Email OTP" required>
-                    </div>
-                    <div class="form-group otp-group">
-                        <input type="text" name="phone" placeholder="Phone Number" required>
-                        <button type="button" class="otp-button">Send OTP</button>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" name="phone_otp" placeholder="Enter Phone OTP" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" name="password" placeholder="Password" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-                    </div>
-                    <button type="submit">Register</button>
-                    <p class="login-link">Already have an account? <a href="login.php">Login here</a></p>
-                </form>
+            <div class="register-right">
+                <div class="register-form-container">
+                    <h2>Create Account</h2>
+                    <form action="register_process.php" method="post">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstname">First Name</label>
+                                <input type="text" id="firstname" name="firstname">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastname">Last Name</label>
+                                <input type="text" id="lastname" name="lastname">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="email_otp">Email OTP</label>
+                            <div class="input-with-button">
+                                <input type="text" id="email_otp" name="email_otp">
+                                <button type="button" class="otp-btn">Send OTP</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone_otp">Phone OTP</label>
+                            <div class="input-with-button">
+                                <input type="text" id="phone_otp" name="phone_otp">
+                                <button type="button" class="otp-btn">Send OTP</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <div class="password-input">
+                                    <input type="password" id="password" name="password">
+                                    <i class="fas fa-eye-slash toggle-password"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm_password">Confirm Password</label>
+                                <div class="password-input">
+                                    <input type="password" id="confirm_password" name="confirm_password">
+                                    <i class="fas fa-eye-slash toggle-password"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="terms">
+                            <input type="checkbox" id="terms">
+                            <label for="terms">
+                                I agree to the <a href="#">Terms & Conditions</a>
+                            </label>
+                        </div>
+                        <button type="submit" class="register-btn">Create Account</button>
+                    </form>
+                    <p class="login-link">Already have an account? <a href="login.php">Sign in here</a></p>
+                </div>
             </div>
         </div>
     </div>
+
+    <script src="../js/register.js"></script>
 </body>
 
 </html>
