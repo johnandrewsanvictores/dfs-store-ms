@@ -19,6 +19,7 @@ const Form_Dom_Manipulate = (function() {
     const brand_el = document.getElementById('brand');
     const category_image_el = document.getElementById('category-image');
     const brand_image_el = document.getElementById('brand-image');
+    const category_select_el = document.getElementById('category-select');
 
 
     const category_container = document.querySelector(".category-container-form");
@@ -126,33 +127,66 @@ const Form_Dom_Manipulate = (function() {
         }
     }
 
-    function populate_category_select(brand_category_id = null) {
-        fetch('../api/classification_api.php?action=get_all_categorys')
+    function populate_category_select() {
+        return fetch('../api/classification_api.php?action=get_all_categorys')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const categorySelect = document.getElementById('category-select');
-                    categorySelect.innerHTML = '<option value="" disabled selected>Select a category</option>';
+                    category_select_el.innerHTML = '<option value="" disabled>Select a category</option>';
                     data.categorys.forEach(category => {
                         const option = document.createElement('option');
                         option.value = category.id;
                         option.textContent = category.category_name;
-                        categorySelect.appendChild(option);
+                        category_select_el.appendChild(option);
                     });
-
-                    if (brand_category_id) {
-                        categorySelect.value = brand_category_id;
-                    }
                 }
             })
             .catch(error => console.error('Error fetching categories:', error));
+    }
+
+    function fill_form(data) {
+        var data = data[0];
+        switch (classification_select.value) {
+            case 'texture':
+                texture_el.value = data.texture_name;
+                break;
+
+            case 'material':
+                material_el.value = data.material_name;
+                break;
+
+            case 'color':
+                color_el.value = data.hex_value;
+                color_input_field.value = data.hex_value;
+                break;
+
+            case 'category':
+                category_el.value = data.category_name;
+                category_image_preview.src =  "../" +  data.image_path;
+                category_image_preview.style.display = 'block';
+                break;
+
+            case 'brand':
+                brand_el.value = data.brand_name;
+                brand_image_preview.src = "../" + data.image_path;
+                brand_image_preview.style.display = 'block';
+                
+                populate_category_select().then(() => {
+                    category_select_el.value = data.category_id;
+                });
+                break;
+        }
+
+        classification_select.disabled = true;
+        hidden_id.value = data.id;
+        hidden_csf.value = classification_select.value;
     }
 
     return {
         add_events,
         classification_change_event,
         hide_inputs,
-        populate_category_select
+        fill_form
     }
 })();
 

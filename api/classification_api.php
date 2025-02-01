@@ -30,63 +30,74 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($action == "update_data") {
-        if ($_POST['classification'] == 'category') {
-            $old_img = $_POST['old_img_src'];
+        $id = $_POST['id'];
+        $classification = $_POST['classification'];
 
-            if ($_FILES['category-image']['name']) {
-                $uploadDir = 'assets/uploads/category/'; // Ensure this directory exists
-
-                // Get the original file extension
+        if ($classification == 'category') {
+            $name = $_POST['category'];
+            if (isset($_FILES['category-image']) && $_FILES['category-image']['name']) {
+                $uploadDir = 'assets/uploads/category/';
                 $fileExtension = pathinfo($_FILES['category-image']['name'], PATHINFO_EXTENSION);
-
-                // Generate a unique file name using a combination of a timestamp and the original file extension
                 $uniqueFilename = uniqid('category', true) . '.' . $fileExtension;
                 $targetFile = $uploadDir . $uniqueFilename;
 
-                if (move_uploaded_file($_FILES['category-image']['tmp_name'], '../' . $targetFile)) {
-                    $pic = $targetFile;
+                if (!file_exists('../' . $uploadDir)) {
+                    mkdir('../' . $uploadDir, 0777, true);
+                }
 
-                    if (file_exists('../' . $old_img)) {
-                        unlink('../' . $old_img); // Delete the image file
+                if (move_uploaded_file($_FILES['category-image']['tmp_name'], '../' . $targetFile)) {
+                    $image_path = $targetFile;
+                    if (isset($_POST['old_img_src']) && file_exists('../' . $_POST['old_img_src'])) {
+                        unlink('../' . $_POST['old_img_src']);
                     }
                 }
             } else {
-                $pic = $old_img;
+                $image_path = $_POST['old_img_src'] ?? null;
             }
-            $name = $_POST['category'];
-        } else if ($_POST["classification"] == 'brand') {
-            $old_img = $_POST['old_img_src'];
-
-            if ($_FILES['brand-image']['name']) {
-                $uploadDir = 'assets/uploads/brand/'; // Ensure this directory exists
-
-                // Get the original file extension
+            $response = $classification_model->update_category($id, $name, $image_path);
+        } else if ($classification == 'brand') {
+            $name = $_POST['brand'];
+            if (isset($_FILES['brand-image']) && $_FILES['brand-image']['name']) {
+                $uploadDir = 'assets/uploads/brand/';
                 $fileExtension = pathinfo($_FILES['brand-image']['name'], PATHINFO_EXTENSION);
-
-                // Generate a unique file name using a combination of a timestamp and the original file extension
                 $uniqueFilename = uniqid('brand', true) . '.' . $fileExtension;
                 $targetFile = $uploadDir . $uniqueFilename;
 
-                if (move_uploaded_file($_FILES['brand-image']['tmp_name'], '../' . $targetFile)) {
-                    $pic = $targetFile;
+                if (!file_exists('../' . $uploadDir)) {
+                    mkdir('../' . $uploadDir, 0777, true);
+                }
 
-                    if (file_exists('../' . $old_img)) {
-                        unlink('../' . $old_img); // Delete the image file
+                if (move_uploaded_file($_FILES['brand-image']['tmp_name'], '../' . $targetFile)) {
+                    $image_path = $targetFile;
+                    if (isset($_POST['old_img_src']) && file_exists('../' . $_POST['old_img_src'])) {
+                        unlink('../' . $_POST['old_img_src']);
                     }
                 }
             } else {
-                $pic = $old_img;
+                $image_path = $_POST['old_img_src'] ?? null;
             }
-            $name = $_POST['brand'];
+            $category_id = $_POST['category_id'];
+            $response = $classification_model->update_brand($id, $name, $image_path, $category_id);
         } else {
-            $name = $_POST['texture'] ?? $_POST['material'] ?? null;
-            $pic = null;
+            // For texture, material, and color
+            $texture = null;
+            $material = null;
+            $hex_value = null;
+
+            switch ($classification) {
+                case 'texture':
+                    $texture = $_POST['texture'];
+                    break;
+                case 'material':
+                    $material = $_POST['material'];
+                    break;
+                case 'color':
+                    $hex_value = $_POST['hexvalue'];
+                    break;
+            }
+
+            $response = $classification_model->update_classification($id, $classification, $texture, $material, $hex_value);
         }
-        $id = $_POST['id'];
-        $classification = $_POST['classification'];
-        $hex_value = $_POST['hexvalue'] ?? null;
-        $category_id = $_POST['category_id'] ?? null;
-        $response = $classification_model->update_classification($id, $classification, $name, $hex_value, $category_id, $pic);
         echo $response;
         exit();
     }

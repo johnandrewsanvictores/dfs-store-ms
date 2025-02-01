@@ -63,41 +63,58 @@ class Classification_Model
         return json_encode($this->response);
     }
 
-    public function update_classification($id, $classification, $name, $hex_value = null, $category_id = null, $picture = null)
+    public function update_classification($id, $classification, $texture = null, $material = null, $hex_value = null)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            if ($classification === "category") {
-                $stmt = $this->pdo->prepare("UPDATE category SET category_name = :name, image_path = :img WHERE id = :id");
-                $stmt->bindParam(':img', $picture);
-                $stmt->bindParam(':name', $name);
-            } else if ($classification === "brand") {
-                $stmt = $this->pdo->prepare("UPDATE brand SET brand_name = :name, image_path = :img, category_id = :category_id WHERE id = :id");
-                $stmt->bindParam(':img', $picture);
-                $stmt->bindParam(':name', $name);
-                $stmt->bindParam(':category_id', $category_id);
-            } else {
-                $column_name = '';
-                if ($classification == 'brand') {
-                    $column_name = 'brand_name';
-                } elseif ($classification == 'texture') {
-                    $column_name = 'texture_name';
-                } elseif ($classification == 'color') {
-                    $column_name = '';
-                } else {
-                    throw new Exception("Invalid classification type");
-                }
 
-                if ($column_name) {
-                    $stmt = $this->pdo->prepare("UPDATE classification SET $column_name = :name, hex_value = :hex_value WHERE id = :id");
-                    $stmt->bindParam(':name', $name);
-                } else {
-                    $stmt = $this->pdo->prepare("UPDATE classification SET hex_value = :hex_value WHERE id = :id");
-                }
-
-                $stmt->bindParam(':hex_value', $hex_value);
+            // Check for existing values
+            if ($classification == 'texture' && $texture) {
+                $nameCheckSql = "SELECT COUNT(*) FROM classification WHERE texture_name = :name AND id != :id";
+                $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
+                $nameCheckStmt->bindValue(':name', $texture);
+            } elseif ($classification == 'material' && $material) {
+                $nameCheckSql = "SELECT COUNT(*) FROM classification WHERE material_name = :name AND id != :id";
+                $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
+                $nameCheckStmt->bindValue(':name', $material);
+            } elseif ($classification == 'color' && $hex_value) {
+                $nameCheckSql = "SELECT COUNT(*) FROM classification WHERE hex_value = :name AND id != :id";
+                $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
+                $nameCheckStmt->bindValue(':name', $hex_value);
             }
-            $stmt->bindParam(':id', $id);
+
+            if (isset($nameCheckStmt)) {
+                $nameCheckStmt->bindValue(':id', $id);
+                $nameCheckStmt->execute();
+                if ($nameCheckStmt->fetchColumn() > 0) {
+                    $this->response['success'] = false;
+                    $this->response['message'] = "This value already exists!";
+                    return json_encode($this->response);
+                }
+            }
+
+            // Update the appropriate field based on classification type
+            $sql = "UPDATE classification SET classification = :classification";
+            $params = [':classification' => $classification, ':id' => $id];
+
+            if ($classification == 'texture') {
+                $sql .= ", texture_name = :texture_name, material_name = NULL, hex_value = NULL";
+                $params[':texture_name'] = $texture;
+            } elseif ($classification == 'material') {
+                $sql .= ", material_name = :material_name, texture_name = NULL, hex_value = NULL";
+                $params[':material_name'] = $material;
+            } elseif ($classification == 'color') {
+                $sql .= ", hex_value = :hex_value, texture_name = NULL, material_name = NULL";
+                $params[':hex_value'] = $hex_value;
+            }
+
+            $sql .= " WHERE id = :id";
+
+            $stmt = $this->pdo->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+
             $stmt->execute();
 
             $this->response['success'] = true;
@@ -542,6 +559,101 @@ class Classification_Model
             }
 
             return json_encode($this->response);
+        }
+    }
+
+    public function update_category($id, $name, $image_path = null)
+    {
+        try {
+            // Check if category name already exists
+            $checkStmt = $this->pdo->prepare("SELECT COUNT(*) FROM category WHERE category_name = :name AND id != :id");
+            $checkStmt->bindParam(':name', $name);
+            $checkStmt->bindParam(':id', $id);
+            $checkStmt->execute();
+
+            if ($checkStmt->fetchColumn() > 0) {
+                return json_encode([
+                    'success' => false,
+                    'message' => 'Category name already exists!'
+                ]);
+            }
+
+            $sql = "UPDATE classification SET category_name = :name";
+            $params = [':name' => $name, ':id' => $id];
+
+            if ($image_path !== null) {
+                $sql .= ", image_path = :image_path";
+                $params[':image_path'] = $image_path;
+            }
+
+            $sql .= " WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+
+            if ($stmt->execute($params)) {
+                return json_encode([
+                    'success' => true,
+                    'message' => 'Category updated successfully'
+                ]);
+            }
+            return json_encode([
+                'success' => false,
+                'message' => 'Failed to update category'
+            ]);
+        } catch (Exception $e) {
+            return json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function update_brand($id, $name, $image_path = null, $category_id = null)
+    {
+        try {
+            // Check if brand name already exists
+            $checkStmt = $this->pdo->prepare("SELECT COUNT(*) FROM brand WHERE brand_name = :name AND id != :id");
+            $checkStmt->bindParam(':name', $name);
+            $checkStmt->bindParam(':id', $id);
+            $checkStmt->execute();
+
+            if ($checkStmt->fetchColumn() > 0) {
+                return json_encode([
+                    'success' => false,
+                    'message' => 'Brand name already exists!'
+                ]);
+            }
+
+            $sql = "UPDATE brand SET brand_name = :name";
+            $params = [':name' => $name, ':id' => $id];
+
+            if ($image_path !== null) {
+                $sql .= ", image_path = :image_path";
+                $params[':image_path'] = $image_path;
+            }
+
+            if ($category_id !== null) {
+                $sql .= ", category_id = :category_id";
+                $params[':category_id'] = $category_id;
+            }
+
+            $sql .= " WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+
+            if ($stmt->execute($params)) {
+                return json_encode([
+                    'success' => true,
+                    'message' => 'Brand updated successfully'
+                ]);
+            }
+            return json_encode([
+                'success' => false,
+                'message' => 'Failed to update brand'
+            ]);
+        } catch (Exception $e) {
+            return json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }

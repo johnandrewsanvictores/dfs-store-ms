@@ -412,3 +412,33 @@
 .remove-selected-btn:hover {
     background-color: var(--red-hover-color);
 }
+
+input[type="file"] {
+    width: 150px;
+    color: rgba(0, 0, 0, 0);
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    visibility: visible;
+    color: white;
+    background-color: var(--primary);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+    visibility: visible;
+    color: white;
+    background-color: var(--primary);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover,
+input[type="file"]::file-selector-button:hover {
+    background-color: var(--primary-hover-color);
+}

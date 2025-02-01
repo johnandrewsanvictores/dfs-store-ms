@@ -1,5 +1,3 @@
-var old_img = null;
-
 document.addEventListener("DOMContentLoaded", function() {
     ProductClassification.init();
     Controls.add_events();
@@ -154,6 +152,7 @@ const ProductClassification = (function() {
     }
 
     function delete_items(classification, ids) {
+        console.log('Deleting items:', classification, );
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -204,10 +203,20 @@ const Csf_form_main = (function() {
     function add_data_event() {
         form_title.textContent = "Add New Product Property";
         submit_btn.textContent = "Add";
+        // Get the initial classification value
+        const classification_select = document.querySelector("#classification-select");
+        Form_Dom_Manipulate.classification_change_event(classification_select.value);
         Csf_form_functions.show_csf_form();
     }
 
     async function update_data_event(e) {
+        if (!e) {
+            const id = document.querySelector("#hidden-id").value;
+            const classification = document.querySelector("#hidden-csf").value;
+            Request_Csf.update_data(csf_form);
+            return;
+        }
+
         let target = e.target;
         if (target.tagName.toLowerCase() === 'i') {
             target = target.parentElement;
@@ -220,75 +229,23 @@ const Csf_form_main = (function() {
         Form_Dom_Manipulate.classification_change_event(classification);
         Csf_form_functions.show_csf_form();
 
-        fill_form(data);
+        Form_Dom_Manipulate.fill_form(data);
     }
 
     function submit_data(e) {
         e.preventDefault();
 
-        if (Form_Validation.validate_csf()) {
-            const classification = document.querySelector("#classification-select").value;
-            if (form_title.textContent === "Add New Product Property") {
-                Request_Csf.add_data(csf_form, classification);
-            } else if (form_title.textContent === "Update Product Property") {
-                Request_Csf.update_data(csf_form, classification);
-            }
-        }
-    }
-    
-    function fill_form(data) {
         const classification_select = document.querySelector("#classification-select");
-        const color_input_field = document.querySelector(".color-form-container input");
-        
-        const texture_el = document.getElementById('texture');
-        const material_el = document.getElementById('material');
-        const color_el = document.getElementById('hexvalue');
-        const category_el = document.getElementById('category');
-        const brand_el = document.getElementById('brand');
-
-        const category_image_preview = document.getElementById('category-image-preview');
-        const brand_image_preview = document.getElementById('brand-image-preview');
-
-        const hidden_id = document.querySelector("#hidden-id");
         const hidden_csf = document.querySelector("#hidden-csf");
-
-        const category_select_el = document.getElementById('category-select');
-
-        var data = data[0];
-
-        switch (classification_select.value) {
-            case 'texture':
-                texture_el.value = data.texture_name;
-                break;
-
-            case 'material':
-                material_el.value = data.material_name;
-                break;
-
-            case 'color':
-                color_el.value = data.hex_value;
-                color_input_field.value = data.hex_value;
-                break;
-
-            case 'category':
-                category_el.value = data.category_name;
-                category_image_preview.src =  "../" +  data.image_path;
-                category_image_preview.style.display = 'block';
-                break;
-
-            case 'brand':
-                Form_Dom_Manipulate.populate_category_select(data.category_id)
-                brand_el.value = data.brand_name;
-                brand_image_preview.src = "../" + data.image_path;
-                brand_image_preview.style.display = 'block';
-                break;
-        }
-
-        classification_select.disabled = true;
-        hidden_id.value = data.id;
         hidden_csf.value = classification_select.value;
 
-        old_img = data.image_path;
+        if (Form_Validation.validate_csf()) {
+            if (form_title.textContent === "Add New Product Property") {
+                Request_Csf.add_data(csf_form);
+            } else if (form_title.textContent === "Update Product Property") {
+                update_data_event();
+            }
+        }
     }
 
     return {
@@ -299,11 +256,12 @@ const Csf_form_main = (function() {
 })();
 
 const Request_Csf = (function() {
-    function add_data(form, classification) {
+    function add_data(form) {
         const formData = new FormData(form);
         formData.append('action', "add_data");
-        formData.append('classification', classification);
-    
+        const classification = formData.get('classification');
+        console.log(classification);
+
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -327,12 +285,17 @@ const Request_Csf = (function() {
         xhr.send(formData);
     }
 
-    function update_data(form, classification) {
+    function update_data(form) {
         const formData = new FormData(form);
         formData.append('action', 'update_data');
-        formData.append('old_img_src', old_img);
-        formData.append('classification', classification);
         
+        // Only add old_img_src for brand or category
+        const classification = formData.get('classification');
+        if (classification === 'brand' || classification === 'category') {
+            const old_img = document.querySelector(`#${classification}-image-preview`).src.split('/dfs-store-ms/')[1];
+            formData.append('old_img_src', old_img);
+        }
+
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -344,7 +307,7 @@ const Request_Csf = (function() {
                         Popup1.show_message(response.message, 'success');
                         Csf_form_functions.reset_form();
                         Csf_form_functions.cancel_form();
-                        ProductClassification.load_classifications(classification);
+                        ProductClassification.load_classifications(formData.get('classification'));
                     } else {
                         Popup1.show_message(response.message, 'error');
                     }
