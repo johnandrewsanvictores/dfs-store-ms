@@ -337,40 +337,6 @@
     margin-bottom: 1em;
 }
 
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1em;
-    margin-top: 1em;
-}
-
-.pagination-button {
-    font-size: var(--body);
-    padding: 0.5em 1em;
-    color: var(--font-white);
-    cursor: pointer;
-    outline: none;
-    border: 1px solid var(--stroke-grey);
-    border-radius: 5px;
-    background-color: var(--primary);
-    font-family: inherit;
-}
-
-.pagination-button:disabled {
-    background-color: var(--stroke-grey);
-    cursor: not-allowed;
-}
-
-.pagination-button:hover:not(:disabled) {
-    background-color: var(--primary-hover-color);
-}
-
-.pagination-info {
-    font-size: var(--body);
-    color: var(--font-dark);
-}
-
 .filter-tabs {
     display: flex;
     justify-content: center;

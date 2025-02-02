@@ -11,6 +11,84 @@ class Classification_Model
         $this->response = array();
     }
 
+    // Get all items based on the classification type
+    public function get_all_items($classification_type, $name_field, $search = '', $sort = 'default', $category_id = null)
+    {
+        $params = [];
+
+        try {
+            if ($classification_type == "category") {
+                $sql = "SELECT * FROM category";
+            } else if ($classification_type == "brand") {
+                if ($category_id) {
+                    $sql = "SELECT * FROM brand WHERE category_id = :category_id";
+                    $params[':category_id'] = $category_id;
+                } else {
+                    $sql = "SELECT * FROM brand";
+                }
+            } else {
+                $sql = "SELECT * FROM classification WHERE classification = ?";
+                $params = [$classification_type];
+            }
+
+            if (!empty($search)) {
+                $sql .= " AND {$name_field} LIKE ?";
+                $params[] = "%{$search}%";
+            }
+
+            $sql .= match ($sort) {
+                'name-asc' => " ORDER BY {$name_field} ASC",
+                'name-desc' => " ORDER BY {$name_field} DESC",
+                'date-asc' => " ORDER BY created_at ASC",
+                'date-desc' => " ORDER BY created_at DESC",
+                default => " ORDER BY id DESC"
+            };
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+
+            $this->response['success'] = true;
+            $this->response[$classification_type . 's'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error retrieving items: " . $e->getMessage();
+        }
+        return json_encode($this->response);
+    }
+
+    // Get specific item based on the classification type use for edit filling form
+    public function get_specific_classification($classification, $id)
+    {
+        try {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            switch ($classification) {
+                case "category":
+                    $stmt = $this->pdo->prepare("SELECT * FROM category WHERE id = :id");
+
+                    break;
+                case "brand":
+                    $stmt = $this->pdo->prepare("SELECT * FROM brand WHERE id = :id");
+                    break;
+                default:
+                    $stmt = $this->pdo->prepare("SELECT * FROM classification WHERE id = :id");
+                    break;
+            }
+
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $this->response['success'] = true;
+            $this->response['data'] = $results;
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error retrieving data: " . $e->getMessage();
+        }
+        return json_encode($this->response);
+    }
+
+    // Add new classification (texture, material, color)
     public function add_classification($classification, $texture, $material, $hex_value = null)
     {
         try {
@@ -35,8 +113,6 @@ class Classification_Model
             }
 
             $nameCheckStmt->execute();
-
-            // Get the count of matching names
             $exists = $nameCheckStmt->fetchColumn();
 
             if ($exists > 0) {
@@ -59,10 +135,68 @@ class Classification_Model
             $this->response['success'] = false;
             $this->response['message'] = "Error adding Property: " . $e->getMessage();
         }
-
         return json_encode($this->response);
     }
 
+    // Add new classification with image (category, brand)
+    public function add_classification_with_img($classification, $name, $image, $category_id = null)
+    {
+        try {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            if ($classification == "brand") {
+                $table = "brand";
+                $name_field = "brand_name";
+                $image_path = 'assets/uploads/brand/';
+                $sql = "INSERT INTO brand (brand_name, image_path, category_id) VALUES (:name, :image_path, :category_id)";
+            } else if ($classification == "category") {
+                $table = "category";
+                $name_field = "category_name";
+                $image_path = 'assets/uploads/category/';
+                $sql = "INSERT INTO category (category_name, image_path) VALUES (:name, :image_path)";
+            }
+
+            $nameCheckSql = "SELECT COUNT(*) FROM {$table} WHERE {$name_field} = :name";
+            $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
+            $nameCheckStmt->bindValue(':name', $name);
+            $nameCheckStmt->execute();
+            $exists = $nameCheckStmt->fetchColumn();
+
+            if ($exists > 0) {
+                $this->response['success'] = false;
+                $this->response['message'] = "The Property already exists!";
+                return json_encode($this->response);
+            }
+
+            $unique_image_name = uniqid() . '_' . basename($image['name']);
+            $image_path = $image_path . $unique_image_name;
+
+
+            if (!move_uploaded_file($image['tmp_name'], "../" . $image_path)) {
+                $this->response['success'] = false;
+                $this->response['message'] = "Error Uploading Image";
+            } else {
+
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':image_path', $image_path);
+
+                if ($category_id) {
+                    $stmt->bindParam(':category_id', $category_id);
+                }
+
+                $stmt->execute();
+                $this->response['success'] = true;
+                $this->response['message'] = "Property added successfully.";
+            }
+        } catch (Exception $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error adding Property: " . $e->getMessage();
+        }
+        return json_encode($this->response);
+    }
+
+    // Update classification (texture, material, color)
     public function update_classification($id, $classification, $texture = null, $material = null, $hex_value = null)
     {
         try {
@@ -116,28 +250,82 @@ class Classification_Model
             }
 
             $stmt->execute();
-
             $this->response['success'] = true;
             $this->response['message'] = "Classification updated successfully.";
         } catch (PDOException $e) {
             $this->response['success'] = false;
             $this->response['message'] = "Error updating classification: " . $e->getMessage();
         }
-
         return json_encode($this->response);
     }
 
+    // Update classification with image (category, brand)
+    public function update_classification_with_image($classification, $id, $name, $image_path = null, $category_id = null)
+    {
+        try {
+            if ($classification == "brand") {
+                $table = "brand";
+                $name_field = "brand_name";
+            } else if ($classification == "category") {
+                $table = "category";
+                $name_field = "category_name";
+            }
+
+            $checkStmt = $this->pdo->prepare("SELECT COUNT(*) FROM {$table} WHERE {$name_field} = :name AND id != :id");
+            $checkStmt->bindParam(':name', $name);
+
+            $checkStmt->bindParam(':id', $id);
+            $checkStmt->execute();
+
+            if ($checkStmt->fetchColumn() > 0) {
+                return json_encode([
+                    'success' => false,
+                    'message' => 'The Property already exists!'
+                ]);
+            }
+
+            $sql = "UPDATE {$table} SET {$name_field} = :name";
+            $params = [':name' => $name, ':id' => $id];
+
+            if ($image_path !== null) {
+                $sql .= ", image_path = :image_path";
+                $params[':image_path'] = $image_path;
+            }
+
+            if ($category_id !== null) {
+                $sql .= ", category_id = :category_id";
+                $params[':category_id'] = $category_id;
+            }
+
+            $sql .= " WHERE id = :id";
+            $stmt = $this->pdo->prepare($sql);
+
+            if ($stmt->execute($params)) {
+                return json_encode([
+                    'success' => true,
+                    'message' => 'Property updated successfully'
+                ]);
+            }
+            return json_encode([
+                'success' => false,
+                'message' => 'Failed to update Property'
+            ]);
+        } catch (Exception $e) {
+            return json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // Delete classification (texture, material, color)
     public function delete_classification($ids)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
-
-            // Prepare the delete statement
             $deleteCsfStmt = $this->pdo->prepare("DELETE FROM classification WHERE id IN ($placeholders)");
-
-            // Bind the parameters
             $deleteCsfStmt->execute($ids);
 
             $this->response['success'] = true;
@@ -146,44 +334,38 @@ class Classification_Model
             $this->response['success'] = false;
             $this->response['message'] = "Error deleting classification: " . $e->getMessage();
         }
-
         return json_encode($this->response);
     }
 
+    // Delete category and its brands
     public function delete_category_with_brands($category_ids)
+
     {
         try {
             $this->pdo->beginTransaction();
-
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
             $placeholders = implode(',', array_fill(0, count($category_ids), '?'));
 
-            // Get the category images
             $getCategoryImagesStmt = $this->pdo->prepare("SELECT image_path FROM category WHERE id IN ($placeholders)");
             $getCategoryImagesStmt->execute($category_ids);
             $categoryImages = $getCategoryImagesStmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // Unlink the category images
             foreach ($categoryImages as $image) {
                 if (file_exists("../" . $image)) {
                     unlink("../" . $image);
                 }
             }
 
-            // Get the brand images under the categories
             $getBrandImagesStmt = $this->pdo->prepare("SELECT image_path FROM brand WHERE category_id IN ($placeholders)");
             $getBrandImagesStmt->execute($category_ids);
             $brandImages = $getBrandImagesStmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // Unlink the brand images
             foreach ($brandImages as $image) {
                 if (file_exists("../" . $image)) {
                     unlink("../" . $image);
                 }
             }
 
-            // Delete the categories
             $deleteCategoryStmt = $this->pdo->prepare("DELETE FROM category WHERE id IN ($placeholders)");
             $deleteCategoryStmt->execute($category_ids);
 
@@ -196,35 +378,28 @@ class Classification_Model
             $this->response['success'] = false;
             $this->response['message'] = "Error deleting category: " . $e->getMessage();
         }
-
         return json_encode($this->response);
     }
 
+    // Delete brand
     public function delete_brand($ids)
     {
         try {
             $this->pdo->beginTransaction();
-
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
-            // Get the category images
             $getBrandImagesStmt = $this->pdo->prepare("SELECT image_path FROM brand WHERE id IN ($placeholders)");
             $getBrandImagesStmt->execute($ids);
             $brandImages = $getBrandImagesStmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // Unlink the category images
             foreach ($brandImages as $image) {
                 if (file_exists("../" . $image)) {
                     unlink("../" . $image);
                 }
             }
 
-            // Prepare the delete statement
             $deleteBrandStmt = $this->pdo->prepare("DELETE FROM brand WHERE id IN ($placeholders)");
-
-            // Bind the parameters
             $deleteBrandStmt->execute($ids);
 
             $this->pdo->commit();
@@ -236,10 +411,10 @@ class Classification_Model
             $this->response['success'] = false;
             $this->response['message'] = "Error deleting brand: " . $e->getMessage();
         }
-
         return json_encode($this->response);
     }
 
+    // Delete items (category, brand, texture, material, color)
     public function delete_items($classification, $ids)
     {
         try {
@@ -259,401 +434,6 @@ class Classification_Model
             $this->response['success'] = false;
             $this->response['message'] = "Error deleting items: " . $e->getMessage();
         }
-
         return json_encode($this->response);
-    }
-
-    public function get_all_classifications()
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM classification");
-            $stmt->execute();
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $textures = array_filter($results, function ($item) {
-                return $item['classification'] == 'texture';
-            });
-
-            $materials = array_filter($results, function ($item) {
-                return $item['classification'] == 'material';
-            });
-
-            $colors = array_filter($results, function ($item) {
-                return $item['classification'] == 'color';
-            });
-
-            $this->response['success'] = true;
-            $this->response['textures'] = $textures;
-            $this->response['materials'] = $materials;
-            $this->response['colors'] = $colors;
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving classifications: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function add_category($category_name, $category_image)
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Check if category name already exists
-            $nameCheckSql = "SELECT COUNT(*) FROM category WHERE category_name = :category_name";
-            $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
-            $nameCheckStmt->bindValue(':category_name', $category_name);
-            $nameCheckStmt->execute();
-            $exists = $nameCheckStmt->fetchColumn();
-
-            if ($exists > 0) {
-                $this->response['success'] = false;
-                $this->response['message'] = "The category already exists!";
-                return json_encode($this->response);
-            }
-
-            // Handle image upload
-            $unique_image_name = uniqid() . '_' . basename($category_image['name']);
-            $image_path = 'assets/uploads/category/' . $unique_image_name;
-            if (!move_uploaded_file($category_image['tmp_name'], "../" . $image_path)) {
-                $this->response['success'] = false;
-                $this->response['message'] = "Error Uploading Image";
-            } else {
-                $stmt = $this->pdo->prepare("INSERT INTO category (category_name, image_path) VALUES (:category_name, :image_path)");
-                $stmt->bindParam(':category_name', $category_name);
-                $stmt->bindParam(':image_path', $image_path);
-
-                $stmt->execute();
-
-                $this->response['success'] = true;
-                $this->response['message'] = "Category added successfully.";
-            }
-        } catch (Exception $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error adding category: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function add_brand($brand_name, $brand_image, $category_id)
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Check if brand name already exists
-            $nameCheckSql = "SELECT COUNT(*) FROM brand WHERE brand_name = :brand_name";
-            $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
-            $nameCheckStmt->bindValue(':brand_name', $brand_name);
-            $nameCheckStmt->execute();
-            $exists = $nameCheckStmt->fetchColumn();
-
-            if ($exists > 0) {
-                $this->response['success'] = false;
-                $this->response['message'] = "The brand already exists!";
-                return json_encode($this->response);
-            }
-
-            // Handle image upload
-            $unique_image_name = uniqid() . '_' . basename($brand_image['name']);
-            $image_path = 'assets/uploads/brand/' . $unique_image_name;
-            if (!move_uploaded_file($brand_image['tmp_name'], "../" . $image_path)) {
-                $this->response['success'] = false;
-                $this->response['message'] = "Error Uploading Image";
-            } else {
-                $stmt = $this->pdo->prepare("INSERT INTO brand (brand_name, image_path, category_id) VALUES (:brand_name, :image_path, :category_id)");
-                $stmt->bindParam(':brand_name', $brand_name);
-                $stmt->bindParam(':image_path', $image_path);
-                $stmt->bindParam(':category_id', $category_id);
-
-                $stmt->execute();
-
-                $this->response['success'] = true;
-                $this->response['message'] = "Brand added successfully.";
-            }
-        } catch (Exception $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error adding brand: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function get_all_categories()
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM category");
-            $stmt->execute();
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $this->response['success'] = true;
-            $this->response['categorys'] = $results;
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving categories: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function get_brands_by_category($category_id)
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM brand WHERE category_id = :category_id");
-            $stmt->bindParam(':category_id', $category_id);
-            $stmt->execute();
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $this->response['success'] = true;
-            $this->response['brands'] = $results;
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving brands: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function get_all_brands()
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM brand");
-            $stmt->execute();
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $this->response['success'] = true;
-            $this->response['brands'] = $results;
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving brands: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function get_all_textures()
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM classification WHERE classification = 'texture'");
-            $stmt->execute();
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $this->response['success'] = true;
-            $this->response['textures'] = $results;
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving textures: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function get_all_materials()
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM classification WHERE classification = 'material'");
-            $stmt->execute();
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $this->response['success'] = true;
-            $this->response['materials'] = $results;
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving materials: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function get_all_colors()
-    {
-        try {
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            $stmt = $this->pdo->prepare("SELECT * FROM classification WHERE classification = 'color'");
-            $stmt->execute();
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $this->response['success'] = true;
-            $this->response['colors'] = $results;
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving colors: " . $e->getMessage();
-        }
-
-        return json_encode($this->response);
-    }
-
-    public function get_specific_classification($classification, $id)
-    {
-        if ($classification === "category") {
-            try {
-                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                $stmt = $this->pdo->prepare("SELECT * FROM category WHERE id = :id");
-                $stmt->bindParam(':id', $id);
-                $stmt->execute();
-
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                $this->response['success'] = true;
-                $this->response['data'] = $results;
-            } catch (PDOException $e) {
-                $this->response['success'] = false;
-                $this->response['message'] = "Error retrieving categories: " . $e->getMessage();
-            }
-
-            return json_encode($this->response);
-        } else if ($classification === "brand") {
-            try {
-                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                $stmt = $this->pdo->prepare("SELECT * FROM brand WHERE id = :id");
-                $stmt->bindParam(':id', $id);
-                $stmt->execute();
-
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                $this->response['success'] = true;
-                $this->response['data'] = $results;
-            } catch (PDOException $e) {
-                $this->response['success'] = false;
-                $this->response['message'] = "Error retrieving brand: " . $e->getMessage();
-            }
-
-            return json_encode($this->response);
-        } else {
-            try {
-                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                $stmt = $this->pdo->prepare("SELECT * FROM classification WHERE id = :id");
-                $stmt->bindParam(':id', $id);
-                $stmt->execute();
-
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                $this->response['success'] = true;
-                $this->response['data'] = $results;
-            } catch (PDOException $e) {
-                $this->response['success'] = false;
-                $this->response['message'] = "Error retrieving brand: " . $e->getMessage();
-            }
-
-            return json_encode($this->response);
-        }
-    }
-
-    public function update_category($id, $name, $image_path = null)
-    {
-        try {
-            // Check if category name already exists
-            $checkStmt = $this->pdo->prepare("SELECT COUNT(*) FROM category WHERE category_name = :name AND id != :id");
-            $checkStmt->bindParam(':name', $name);
-            $checkStmt->bindParam(':id', $id);
-            $checkStmt->execute();
-
-            if ($checkStmt->fetchColumn() > 0) {
-                return json_encode([
-                    'success' => false,
-                    'message' => 'Category name already exists!'
-                ]);
-            }
-
-            $sql = "UPDATE classification SET category_name = :name";
-            $params = [':name' => $name, ':id' => $id];
-
-            if ($image_path !== null) {
-                $sql .= ", image_path = :image_path";
-                $params[':image_path'] = $image_path;
-            }
-
-            $sql .= " WHERE id = :id";
-            $stmt = $this->pdo->prepare($sql);
-
-            if ($stmt->execute($params)) {
-                return json_encode([
-                    'success' => true,
-                    'message' => 'Category updated successfully'
-                ]);
-            }
-            return json_encode([
-                'success' => false,
-                'message' => 'Failed to update category'
-            ]);
-        } catch (Exception $e) {
-            return json_encode([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
-        }
-    }
-
-    public function update_brand($id, $name, $image_path = null, $category_id = null)
-    {
-        try {
-            // Check if brand name already exists
-            $checkStmt = $this->pdo->prepare("SELECT COUNT(*) FROM brand WHERE brand_name = :name AND id != :id");
-            $checkStmt->bindParam(':name', $name);
-            $checkStmt->bindParam(':id', $id);
-            $checkStmt->execute();
-
-            if ($checkStmt->fetchColumn() > 0) {
-                return json_encode([
-                    'success' => false,
-                    'message' => 'Brand name already exists!'
-                ]);
-            }
-
-            $sql = "UPDATE brand SET brand_name = :name";
-            $params = [':name' => $name, ':id' => $id];
-
-            if ($image_path !== null) {
-                $sql .= ", image_path = :image_path";
-                $params[':image_path'] = $image_path;
-            }
-
-            if ($category_id !== null) {
-                $sql .= ", category_id = :category_id";
-                $params[':category_id'] = $category_id;
-            }
-
-            $sql .= " WHERE id = :id";
-            $stmt = $this->pdo->prepare($sql);
-
-            if ($stmt->execute($params)) {
-                return json_encode([
-                    'success' => true,
-                    'message' => 'Brand updated successfully'
-                ]);
-            }
-            return json_encode([
-                'success' => false,
-                'message' => 'Failed to update brand'
-            ]);
-        } catch (Exception $e) {
-            return json_encode([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
-        }
     }
 }

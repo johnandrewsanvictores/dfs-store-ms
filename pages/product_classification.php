@@ -39,9 +39,11 @@
                 <input type="text" id="search-input" placeholder="Search..." class="search-input">
                 <div class="sort-dropdown-container">
                     <select class="sort-dropdown">
-                        <option value="default">Sort By</option>
+                        <option value="default">Default</option>
                         <option value="name-asc">Name (A-Z)</option>
                         <option value="name-desc">Name (Z-A)</option>
+                        <option value="date-asc">Oldest First</option>
+                        <option value="date-desc">Newest First</option>
                     </select>
                     <i class="fas fa-sort"></i>
                 </div>
@@ -52,12 +54,6 @@
 
         <div class="card-container" id="card-container">
             <!-- Cards will be dynamically inserted here -->
-        </div>
-
-        <div class="pagination-container">
-            <button class="pagination-button" id="prev-page" disabled>&laquo; Previous</button>
-            <span class="pagination-info">Page 1 of 10</span>
-            <button class="pagination-button" id="next-page">Next &raquo;</button>
         </div>
     </main>
 

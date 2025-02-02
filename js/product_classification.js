@@ -5,17 +5,57 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 const ProductClassification = (function() {
+    // Add state management for search and sort
+    const state = {
+        currentClassification: 'category', // Set default classification
+        searchTerm: '',
+        sortValue: 'default',
+        categoryId: null,
+        categoryName: ''
+    };
+
     function init() {
         load_classifications('category');
         setup_filter_tabs();
         setup_remove_selected_btn();
+        setup_search_and_sort(); // Add new setup function
+    }
+
+    function setup_search_and_sort() {
+        const searchInput = document.querySelector('#search-input');
+        const sortSelect = document.querySelector('.sort-dropdown');
+
+        // Search with debounce
+        searchInput.addEventListener('input', debounce(() => {
+            state.searchTerm = searchInput.value.trim();
+            load_classifications(state.currentClassification, state.categoryId, state.categoryName);
+        }, 300));
+
+        // Sort change
+        sortSelect.addEventListener('change', () => {
+            state.sortValue = sortSelect.value;
+            load_classifications(state.currentClassification, state.categoryId, state.categoryName);
+        });
     }
 
     function load_classifications(classification, categoryId = null, categoryName = '') {
+        state.currentClassification = classification; // Ensure classification is set
+        state.categoryId = categoryId;
+        state.categoryName = categoryName;
+
         let url = `../api/classification_api.php?action=get_all_${classification}s`;
+        
+        // Add search and sort parameters
+        const params = new URLSearchParams({
+            search: state.searchTerm,
+            sort: state.sortValue
+        });
+
         if (classification === 'brand' && categoryId) {
             url = `../api/classification_api.php?action=get_brands_by_category&category_id=${categoryId}`;
         }
+
+        url += `&${params.toString()}`;
 
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
@@ -116,6 +156,7 @@ const ProductClassification = (function() {
                 filterTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 const classification = this.getAttribute('data-filter');
+                state.currentClassification = classification; // Update current classification
                 load_classifications(classification);
             });
         });
@@ -170,6 +211,19 @@ const ProductClassification = (function() {
             }
         };
         xhr.send(`action=delete_data&classification=${classification}&ids=${ids.join(',')}`);
+    }
+
+    // Utility function for debounce
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
 
     return {
