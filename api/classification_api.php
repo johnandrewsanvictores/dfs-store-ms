@@ -114,6 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action'])) {
     $search = $_GET['search'] ?? '';
     $sort = $_GET['sort'] ?? 'default';
+    $status = $_GET['status'] ?? '';
 
     if ($_GET['action'] == "get_specific_data") {
         $id = $_GET['id'];
@@ -128,29 +129,29 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action'])) {
     }
 
     if ($_GET['action'] == "get_all_categorys") {
-        $response = $classification_model->get_all_items('category', 'category_name', $search, $sort);
+        $response = $classification_model->get_all_items('category', 'category_name', $search, $sort, $status);
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_all_brands") {
-        $response = $classification_model->get_all_items('brand', 'brand_name', $search, $sort);
+        $response = $classification_model->get_all_items('brand', 'brand_name', $search, $sort, $status);
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_all_textures") {
-        $response = $classification_model->get_all_items('texture', 'texture_name', $search, $sort);
+        $response = $classification_model->get_all_items('texture', 'texture_name', $search, $sort, $status);
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_all_materials") {
-        $response = $classification_model->get_all_items('material', 'material_name', $search, $sort);
+        $response = $classification_model->get_all_items('material', 'material_name', $search, $sort, $status);
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_all_colors") {
-        $response = $classification_model->get_all_items('color', 'hex_value', $search, $sort);
+        $response = $classification_model->get_all_items('color', 'hex_value', $search, $sort, $status);
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_brands_by_category" && isset($_GET['category_id'])) {
 
         $category_id = $_GET['category_id'];
-        $response = $classification_model->get_all_items('brand', 'brand_name', $search, $sort, $category_id);
+        $response = $classification_model->get_all_items('brand', 'brand_name', $search, $sort, $status, $category_id);
         echo $response;
         exit();
     }

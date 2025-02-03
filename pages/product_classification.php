@@ -37,6 +37,14 @@
             <h5 id="list-title">List of Categories</h5>
             <div class="search-sort-container">
                 <input type="text" id="search-input" placeholder="Search..." class="search-input">
+                <div class="filter-status-dropdown-container">
+                    <select class="filter-status-dropdown">
+                        <option value="">All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
                 <div class="sort-dropdown-container">
                     <select class="sort-dropdown">
                         <option value="default">Default</option>

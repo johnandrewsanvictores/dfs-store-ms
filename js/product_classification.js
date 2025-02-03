@@ -5,11 +5,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 const ProductClassification = (function() {
-    // Add state management for search and sort
+    // Add state management for search, sort, and filter
     const state = {
         currentClassification: 'category', // Set default classification
         searchTerm: '',
         sortValue: 'default',
+        filterStatus: '', // Add filter status
         categoryId: null,
         categoryName: ''
     };
@@ -19,6 +20,7 @@ const ProductClassification = (function() {
         setup_filter_tabs();
         setup_remove_selected_btn();
         setup_search_and_sort(); // Add new setup function
+        setup_filter_status(); // Add new setup function
     }
 
     function setup_search_and_sort() {
@@ -38,6 +40,16 @@ const ProductClassification = (function() {
         });
     }
 
+    function setup_filter_status() {
+        const filterSelect = document.querySelector('.filter-status-dropdown');
+
+        // Filter change
+        filterSelect.addEventListener('change', () => {
+            state.filterStatus = filterSelect.value;
+            load_classifications(state.currentClassification, state.categoryId, state.categoryName);
+        });
+    }
+
     function load_classifications(classification, categoryId = null, categoryName = '') {
         state.currentClassification = classification; // Ensure classification is set
         state.categoryId = categoryId;
@@ -45,10 +57,11 @@ const ProductClassification = (function() {
 
         let url = `../api/classification_api.php?action=get_all_${classification}s`;
         
-        // Add search and sort parameters
+        // Add search, sort, and filter parameters
         const params = new URLSearchParams({
             search: state.searchTerm,
-            sort: state.sortValue
+            sort: state.sortValue,
+            status: state.filterStatus
         });
 
         if (classification === 'brand' && categoryId) {
@@ -76,7 +89,17 @@ const ProductClassification = (function() {
                     if (classification === 'brand' && categoryName) {
                         document.getElementById('list-title').textContent = `List of ${categoryName} Brands`;
                     } else {
-                        document.getElementById('list-title').textContent = `List of ${classification.charAt(0).toUpperCase() + classification.slice(1)}s`;
+                        document.getElementById('list-title').textContent = `List of ${
+                            (
+                              classification.endsWith('y') && !/[aeiou]y$/i.test(classification) 
+                                ? classification.slice(0, -1) + 'ies'
+                                : classification + 's' 
+                            ).charAt(0).toUpperCase() + (
+                              classification.endsWith('y') && !/[aeiou]y$/i.test(classification) 
+                                ? classification.slice(0, -1) + 'ies' 
+                                : classification + 's'
+                            ).slice(1)
+                          }`;
                     }
                     reset_remove_selected_btn();
                 } catch (e) {
@@ -98,6 +121,9 @@ const ProductClassification = (function() {
         let cardContent = `
             <div class="checkbox-container">
                 <input type="checkbox" class="select-checkbox" data-id="${classification}-${item.id}">
+            </div>
+            <div class="status-label ${item.status === 'active' ? 'status-active' : 'status-inactive'}">
+                ${item.status}
             </div>
         `;
 

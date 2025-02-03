@@ -12,49 +12,75 @@ class Classification_Model
     }
 
     // Get all items based on the classification type
-    public function get_all_items($classification_type, $name_field, $search = '', $sort = 'default', $category_id = null)
-    {
-        $params = [];
+    public function get_all_items($classification_type, $name_field, $search = '', $sort = 'default', $status = '', $category_id = null)
+{
+    $params = [];
+    $conditions = [];
 
-        try {
-            if ($classification_type == "category") {
-                $sql = "SELECT * FROM category";
-            } else if ($classification_type == "brand") {
-                if ($category_id) {
-                    $sql = "SELECT * FROM brand WHERE category_id = :category_id";
-                    $params[':category_id'] = $category_id;
-                } else {
-                    $sql = "SELECT * FROM brand";
-                }
+    try {
+        // Determine the base SQL query based on the classification type
+        if ($classification_type == "category") {
+            $sql = "SELECT * FROM category";
+        } else if ($classification_type == "brand") {
+            if ($category_id) {
+                $sql = "SELECT * FROM brand WHERE category_id = :category_id";
+                $params[':category_id'] = $category_id;
             } else {
-                $sql = "SELECT * FROM classification WHERE classification = ?";
-                $params = [$classification_type];
+                $sql = "SELECT * FROM brand";
             }
-
-            if (!empty($search)) {
-                $sql .= " AND {$name_field} LIKE ?";
-                $params[] = "%{$search}%";
-            }
-
-            $sql .= match ($sort) {
-                'name-asc' => " ORDER BY {$name_field} ASC",
-                'name-desc' => " ORDER BY {$name_field} DESC",
-                'date-asc' => " ORDER BY created_at ASC",
-                'date-desc' => " ORDER BY created_at DESC",
-                default => " ORDER BY id DESC"
-            };
-
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-
-            $this->response['success'] = true;
-            $this->response[$classification_type . 's'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            $this->response['success'] = false;
-            $this->response['message'] = "Error retrieving items: " . $e->getMessage();
+        } else {
+            $sql = "SELECT * FROM classification WHERE classification = :classification";
+            $params[':classification'] = $classification_type;
         }
-        return json_encode($this->response);
+
+        // Add search condition if provided
+        if (!empty($search)) {
+            $conditions[] = "{$name_field} LIKE :search";
+            $params[':search'] = "%{$search}%";
+        }
+
+        // Add status condition if provided
+        if (!empty($status)) {
+            $conditions[] = "status = :status";
+            $params[':status'] = $status;
+        }
+
+        // Combine conditions with the base SQL query
+        if (!empty($conditions)) {
+            // Check if the base query already has a WHERE clause
+            if (strpos($sql, 'WHERE') !== false) {
+                // If it already has a WHERE clause, append conditions with AND
+                $sql .= " AND " . implode(" AND ", $conditions);
+            } else {
+                // If it doesn't have a WHERE clause, add WHERE
+                $sql .= " WHERE " . implode(" AND ", $conditions);
+            }
+        }
+
+        // Add sorting based on the provided sort option
+        $sortField = match ($sort) {
+            'name-asc' => "{$name_field} ASC",
+            'name-desc' => "{$name_field} DESC",
+            'date-asc' => "created_at ASC",
+            'date-desc' => "created_at DESC",
+            default => "id DESC"
+        };
+        $sql .= " ORDER BY " . $sortField;
+
+        // Prepare and execute the SQL query
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        // Set the response
+        $this->response['success'] = true;
+        $this->response[$classification_type . 's'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        $this->response['success'] = false;
+        $this->response['message'] = "Error retrieving items: " . $e->getMessage();
     }
+
+    return json_encode($this->response);
+}
 
     // Get specific item based on the classification type use for edit filling form
     public function get_specific_classification($classification, $id)
