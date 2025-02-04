@@ -124,14 +124,15 @@ class Staff_Account_Model
             }
 
             $image_path = 'assets/uploads/staff_profile/';
-            $unique_image_name = uniqid() . '_' . basename($profile_pic['name']);
+            $file_extension = pathinfo($profile_pic['name'], PATHINFO_EXTENSION);
+            $unique_image_name = uniqid() . '.' . $file_extension;
             $image_path = $image_path . $unique_image_name;
 
             if (!move_uploaded_file($profile_pic['tmp_name'], "../" . $image_path)) {
                 $this->response['success'] = false;
                 $this->response['message'] = "Error Uploading Image";
             } else {
-                
+
 
                 $stmt = $this->pdo->prepare("INSERT INTO staff_acc (staff_id, name, username, phone_number, role, password, image_path, email, status, address)
                                         VALUES (:staff_id, :name, :uname, :pnumber, :role, :password, :image_path, :email, :status, :address)");
@@ -233,7 +234,7 @@ class Staff_Account_Model
         }
     }
 
-    public function update_staff_acc($staff_id, $name, $username, $pnumber, $role, $password)
+    public function update_staff_acc($staff_id, $name, $username, $pnumber, $role, $password, $email, $status, $profile_pic, $address)
     {
         $sql = "";
         try {
@@ -254,7 +255,7 @@ class Staff_Account_Model
 
             $sql = "UPDATE staff_acc 
                                      SET name = :name, username = :uname, phone_number = :pnumber, 
-                                         role = :role";
+                                         role = :role, email = :email, status = :status, address = :address, image_path = :image_path";
 
             if (!empty($password)) {
                 $sql .= ", password = :password";
@@ -271,6 +272,11 @@ class Staff_Account_Model
             $stmt->bindParam(':pnumber', $pnumber);
             $stmt->bindParam(':role', $role);
             $stmt->bindParam(':staff_id', $staff_id);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':status', $status);
+            $stmt->bindParam(':address', $address);
+            $stmt->bindParam(':image_path', $profile_pic);
+
 
             if (!empty($password)) {
                 $password_hash = password_hash($password, PASSWORD_BCRYPT);
@@ -300,9 +306,23 @@ class Staff_Account_Model
         $placeholdersString = implode(',', $placeholders);
 
         try {
+
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $getStaffImagesStmt = $this->pdo->prepare("SELECT image_path FROM staff_acc WHERE id IN ($placeholdersString)");
+            $getStaffImagesStmt->execute($idsArray);
+            $staffImages = $getStaffImagesStmt->fetchAll(PDO::FETCH_COLUMN);
+
+            foreach ($staffImages as $image) {
+                if (file_exists("../" . $image)) {
+                    unlink("../" . $image);
+                }
+            }
+
             $deleteQuery = "DELETE FROM staff_acc WHERE id IN ($placeholdersString)";
             $deleteStmt = $this->pdo->prepare($deleteQuery);
             $deleteStmt->execute($idsArray); // Execute with the IDs array
+
 
             // Check if the delete was successful
             if ($deleteStmt->rowCount() > 0) {

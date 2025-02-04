@@ -7,6 +7,7 @@
 
         <form action="" method="POST" id="staff-form" enctype="multipart/form-data" novalidate>
             <div class="form-grid">
+
                 <div class="profile-upload-div">
                     <label>Profile Picture<span>*</span></label>
                     <div class="profile-input-container">
@@ -23,7 +24,9 @@
 
                 <div class="form-fields-container">
                     <input type="hidden" name="staff-id" value="" />
-                    
+                    <input type="hidden" name="old-img-src" id="old-img-src" value="">
+
+
                     <div class="input-group">
                         <div class="input-div">
                             <label for="name">Name<span>*</span></label>
@@ -129,7 +132,7 @@
         width: 100%;
         max-width: 50em;
         border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         transform: scale(0);
         opacity: 0;
         visibility: hidden;
@@ -408,13 +411,14 @@
         background-position: right 1em center;
         background-size: 1em;
     }
+
     .profile-input-container .error-message {
         position: absolute;
         bottom: -1.5em;
         left: 0;
         width: 100%;
     }
-    
+
     #generate-password-btn {
         padding: 0.8em 1em;
         background-color: var(--primary);

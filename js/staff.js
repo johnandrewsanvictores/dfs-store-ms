@@ -1,4 +1,3 @@
-
 var table = null;
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -93,19 +92,41 @@ const Staff_Form_Main = (function () {
         const username = document.querySelector('#username');
         const phone_number = document.querySelector('#pnumber');
         const role_select_el = document.querySelector('#staff-form select[name="role"]');
-
+        const status_select_el = document.querySelector('#staff-form select[name="status"]');
         const staff_id = document.querySelector('input[name="staff-id"]');
         const current_staff_id = document.querySelector('#current-staff-id');
         const address = document.querySelector('#address');
         const email = document.querySelector('#email');
+        const profileContainer = document.querySelector('.profile-input-container');
+        const profilePreview = document.querySelector('.profile-preview-image') || new Image();
+        const old_img_src = document.querySelector('input[name="old-img-src"]');
 
+        // Fill text inputs and selects
         name.value = data.name;
         username.value = data.username;
         phone_number.value = data.phone_number;
         role_select_el.value = data.role;
+        status_select_el.value = data.status;
         staff_id.value = data.staff_id;
         current_staff_id.textContent = data.staff_id;
+        address.value = data.address;
+        email.value = data.email;
+        old_img_src.value = data.image_path;
 
+        // Handle profile image
+        if (data.image_path) {
+            profilePreview.classList.add('profile-preview-image');
+            profilePreview.src = "../" + data.image_path;
+            if (!profilePreview.parentElement) {
+                profileContainer.appendChild(profilePreview);
+            }
+            profileContainer.classList.add('has-image');
+        } else {
+            profileContainer.classList.remove('has-image');
+            if (profilePreview.parentElement) {
+                profilePreview.remove();
+            }
+        }
     }
 
     async function edit_data_event(e) {
