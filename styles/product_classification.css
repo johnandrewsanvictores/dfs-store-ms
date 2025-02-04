@@ -97,6 +97,19 @@
     background-color: var(--red-hover-color);
 }
 
+.status-btn {
+    background-color: var(--secondary);
+    color: var(--font-white);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 0.3em 0.6em;
+}
+
+.status-btn:hover {
+    background-color: var(--secondary-hover-color);
+}
+
 .no-data-message {
     text-align: center;
     font-size: var(--body);

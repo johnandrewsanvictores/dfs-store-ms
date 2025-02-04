@@ -141,6 +141,7 @@ const ProductClassification = (function() {
             <div class="card-color-info"><div class="actions">
                 <button class="edit-btn" id="${classification}-${item.id}"><i class="fas fa-edit"></i></button>
                 <button class="delete-btn" id="${classification}-${item.id}"><i class="fas fa-trash-alt"></i></button>
+                <button class="status-btn" id="${classification}-${item.id}"><i class="fas fa-exchange-alt"></i></button>
             </div>
         `;
 
@@ -170,7 +171,15 @@ const ProductClassification = (function() {
         });
 
         const edit_btn = card.querySelector('.edit-btn');
-        edit_btn.addEventListener('click', Csf_form_main.update_data_event)
+        edit_btn.addEventListener('click', Csf_form_main.update_data_event);
+
+        const status_btn = card.querySelector('.status-btn');
+        status_btn.addEventListener('click', function() {
+            const [classification, id] = this.id.split('-');
+            change_status(classification, [id]);
+        });
+
+
 
         return card;
     }
@@ -237,6 +246,27 @@ const ProductClassification = (function() {
             }
         };
         xhr.send(`action=delete_data&classification=${classification}&ids=${ids.join(',')}`);
+    }
+
+    function change_status(classification, ids) {
+        console.log('Deleting items:', classification, );
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/dfs-store-ms/api/classification_api.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    Popup1.show_message(response.message, 'success');
+                    load_classifications(classification);
+                } else {
+                    Popup1.show_message(response.message, 'error');
+                }
+            } else {
+                console.error('Error:', xhr.status);
+            }
+        };
+        xhr.send(`action=change_status&classification=${classification}&ids=${ids.join(',')}`);
     }
 
     // Utility function for debounce

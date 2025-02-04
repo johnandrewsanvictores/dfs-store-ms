@@ -462,4 +462,46 @@ class Classification_Model
         }
         return json_encode($this->response);
     }
+
+    //change status of data
+    public function update_status($classification, $ids)
+    {
+        try {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Determine the table based on the classification
+            if ($classification == 'category') {
+                $table = "category";
+            } elseif ($classification == 'brand') {
+                $table = "brand";
+            } else {
+                $table = "classification";
+            }
+
+            // Create placeholders for the IDs
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+            // Fetch the current status of the items
+            $selectStmt = $this->pdo->prepare("SELECT id, status FROM $table WHERE id IN ($placeholders)");
+            $selectStmt->execute($ids);
+            $items = $selectStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Update the status of each item
+            foreach ($items as $item) {
+                $newStatus = ($item['status'] == 'active') ? 'inactive' : 'active';
+                $updateStmt = $this->pdo->prepare("UPDATE $table SET status = :status WHERE id = :id");
+                $updateStmt->execute([
+                    ':status' => $newStatus,
+                    ':id' => $item['id']
+                ]);
+            }
+
+            $this->response['success'] = true;
+            $this->response['message'] = "Status updated successfully.";
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error updating status: " . $e->getMessage();
+        }
+        return json_encode($this->response);
+    }
 }

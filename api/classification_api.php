@@ -109,6 +109,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo $response;
         exit();
     }
+
+    if ($action == "change_status") {
+        $ids = explode(',', $_POST['ids']);
+        $classification = $_POST['classification'];
+        $response = $classification_model->update_status($classification, $ids);
+        echo $response;
+        exit();
+    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action'])) {

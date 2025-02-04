@@ -59,6 +59,8 @@
         </div>
 
         <button class="remove-selected-btn" id="remove-selected-btn" disabled>Remove selected (0)</button>
+        <button class="remove-selected-btn" id="remove-selected-btn" disabled>Change Status selected (0)</button>
+
 
         <div class="card-container" id="card-container">
             <!-- Cards will be dynamically inserted here -->
