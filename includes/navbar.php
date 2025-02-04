@@ -28,23 +28,7 @@ $login_user_data = $response->data[0];
             </li>
 
             <li class="item">
-                <div class="submenu-item">
-                    <span>Product Classification</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-                <ul class="menu-items submenu">
-                    <div class="menu-title">
-                        <i class="fa-solid fa-chevron-left"></i>
-                        Product Classification
-                    </div>
-                    <li class="item">
-                        <a href="product_classification.php">Classification</a>
-                    </li>
-                    <li class="item">
-                        <a href="category_brand.php">Brand/Category</a>
-                    </li>
-                </ul>
+                <a href="product_classification.php">Product Classification</a>
             </li>
 
             <li class="item">
@@ -68,9 +52,13 @@ $login_user_data = $response->data[0];
             <li class="item">
                 <a href="inventory.php">Inventory</a>
             </li>
-
+            
             <li class="item">
                 <a href="#">Sales Report</a>
+            </li>
+
+            <li class="item">
+                <a href="pos.php">POS</a>
             </li>
 
             <hr>
