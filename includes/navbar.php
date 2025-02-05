@@ -28,23 +28,7 @@ $login_user_data = $response->data[0];
             </li>
 
             <li class="item">
-                <div class="submenu-item">
-                    <span>Product Classification</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-
-                <ul class="menu-items submenu">
-                    <div class="menu-title">
-                        <i class="fa-solid fa-chevron-left"></i>
-                        Product Classification
-                    </div>
-                    <li class="item">
-                        <a href="product_classification.php">Classification</a>
-                    </li>
-                    <li class="item">
-                        <a href="category_brand.php">Brand/Category</a>
-                    </li>
-                </ul>
+                <a href="product_classification.php">Product Classification</a>
             </li>
 
             <li class="item">
@@ -68,9 +52,13 @@ $login_user_data = $response->data[0];
             <li class="item">
                 <a href="inventory.php">Inventory</a>
             </li>
-
+            
             <li class="item">
                 <a href="#">Sales Report</a>
+            </li>
+
+            <li class="item">
+                <a href="pos.php">POS</a>
             </li>
 
             <hr>
@@ -116,8 +104,22 @@ $login_user_data = $response->data[0];
 <nav class="navbar">
     <i class="fa-solid fa-bars" id="sidebar-close"></i>
     <div class="user-nav-div">
-        <p><?php echo ucfirst($login_user_data->name); ?> <span class="role-text-nav">(<?php echo ucfirst($login_user_data->role); ?>)</span></p>
-        <i class="fa-solid fa-right-from-bracket" id="logout-btn"></i>
+
+
+        <div class="user-container">
+            <p><?php echo ucfirst($login_user_data->name); ?> <span class="role-text-nav">(<?php echo ucfirst($login_user_data->role); ?>)</span></p>
+            <button id="caret-down-btn">
+                <i class="fa-solid fa-caret-down" id="caret-down"></i>
+            </button>
+            <div class="user-info">
+                <ul class="dropdown">
+                    <p><?php echo ucfirst($login_user_data->name); ?> <span class="role-text-nav">(<?php echo ucfirst($login_user_data->role); ?>)</span></p>
+                    <hr>
+                    <li><a href="#">Manage Account</a></li>
+                    <li><button id="logout-btn">Log out<i class="fa-solid fa-right-from-bracket"></i></button></li>
+                </ul>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -256,7 +258,6 @@ $login_user_data = $response->data[0];
         padding: 15px 20px;
         font-size: 25px;
         background: var(--primary);
-        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -272,18 +273,133 @@ $login_user_data = $response->data[0];
         align-items: center;
     }
 
-
-
     .user-nav-div p {
         font-size: var(--body);
     }
 
+    #caret-down {
+        font-size: 14px;
+        color: inherit;
+    }
+
+    #caret-down-btn {
+        cursor: pointer;
+        color: inherit;
+        background: transparent;
+        outline: none;
+        border: none;
+    }
+
+    .user-container {
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+        -webkit-user-select: none;
+        /* Safari */
+        -ms-user-select: none;
+        /* IE 10 and IE 11 */
+        user-select: none;
+        /* Standard syntax */
+    }
+
+    .user-container div {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .user-container .clicked {
+        visibility: visible;
+        opacity: 1;
+        text-align: left;
+        margin-left: 30px;
+        padding-top: 20px;
+        box-shadow: 0px 3px 5px -1px #ccc;
+        z-index: 999;
+        top: 30px;
+        color: var(--font-dark);
+    }
+
+    .user-container .dropdown {
+        position: absolute;
+        padding-left: 0;
+        right: 0;
+        background: white;
+        min-width: 10em;
+        color: var(--font-dark);
+        visibility: hidden;
+        opacity: 0;
+
+        border-radius: 5px;
+        padding: 1.5em 1em;
+        box-shadow: 0px 3px 5px -1px #ccc;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        align-items: flex-end;
+        list-style-type: none;
+        font-size: var(--body);
+        width: 15em;
+        margin-top: -10px;
+        transition: 0.3s all ease-out;
+    }
+
+    .user-container .clicked {
+        visibility: visible;
+        opacity: 1;
+        text-align: left;
+        z-index: 999;
+        box-shadow: 0px 3px 5px -1px #ccc;
+        margin-top: -10px;
+        color: var(--font-dark);
+    }
+
+    .user-container .dropdown p {
+        font-size: var(--body);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-self: center;
+        text-align: center;
+    }
+
+    .dropdown .role-text-nav {
+        color: var(--primary);
+    }
+
+    .user-container .dropdown hr {
+        border: 1px solid var(--stroke-grey);
+        width: 100%;
+    }
+
+    .user-container .dropdown li a {
+        text-decoration: none;
+        color: var(--font-dark);
+    }
+
+    .user-container .dropdown li a:hover {
+        color: #bbb;
+    }
+
     #logout-btn {
         cursor: pointer;
+        border: none;
+        outline: none;
+        background: transparent;
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+        font-size: inherit;
+        color: inherit;
     }
 
     #logout-btn:hover {
-        color: var(--tertiary);
+        color: #bbb;
+    }
+
+
+
+    .user-container div ul .user-nav-div p {
+        font-size: var(--body);
     }
 
     .role-text-nav {
@@ -340,6 +456,12 @@ $login_user_data = $response->data[0];
             menu.classList.remove("submenu-active");
         });
     });
+
+    var caretdown = document.querySelector('#caret-down');
+
+    caretdown.addEventListener('click', () => {
+        document.querySelector('.dropdown').classList.toggle('clicked');
+    })
 
     logout_btn.addEventListener('click', () => Popup1.show_confirm_dialog("Are you sure you want to logout?", logout));
 
