@@ -499,8 +499,7 @@ $login_user_data = $response->data[0];
                 const response = JSON.parse(xhr.responseText);
                 if (response.success) {
                     console.log(response.message); // Optional: Log the message
-                    // Redirect to the login page
-                    window.location.href = '/dfs-store-ms/pages/login.php';
+                    window.location.href = response.redirect_url; // Redirect to the login page
                 } else {
                     console.error('Logout failed:', response.message);
                     alert('Error: ' + response.message);
