@@ -292,7 +292,7 @@ const Request_Staff = (function () {
     function add_data(form) {
         const formData = new FormData(form);
         formData.append('action', "add_data")
-
+        console.log("Hi")
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/dfs-store-ms/api/staff_api.php', true);
@@ -322,6 +322,8 @@ const Request_Staff = (function () {
     function update_data(form) {
         const formData = new FormData(form);
         formData.append('action', 'update_data');
+        console.log(formData.get('profile_pic'))
+
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/dfs-store-ms/api/staff_api.php', true);
@@ -422,8 +424,7 @@ const Table = (function () {
                 type: "post",
                 data: { 'action': "datatableDisplay", "selected_role" : selected_role.value, "selected_status" : selected_status.value },
             },
-            // ajax: "../../api/business_datatable_api.php",
-            "columns": [
+            columns: [
                 { "data": "id", visible: false },
                 { "data": "staff_id" },
                 { "data": "name" },
@@ -432,7 +433,42 @@ const Table = (function () {
                 { "data": "role" },
                 { "data": "date_added" },
                 { "data": "last_login" },
-                { "data": "status" }
+                { 
+                    "data": "status",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            const isActive = data.toLowerCase() === 'active';
+                            const bgColor = isActive ? '#E3FCF4' : '#FEE4E2';
+                            const textColor = isActive ? '#039855' : '#D92D20';
+                            const dotColor = isActive ? '#12B76A' : '#F04438';
+                            
+                            return `<span class="status-badge" style="
+                                background-color: ${bgColor}; 
+                                color: ${textColor}; 
+                                padding: 6px 12px;
+                                border-radius: 16px;
+                                font-size: 12px;
+                                font-weight: 500;
+                                text-transform: capitalize;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 6px;
+                                min-width: 80px;
+                                justify-content: center;
+                            ">
+                                <span style="
+                                    width: 6px;
+                                    height: 6px;
+                                    background-color: ${dotColor};
+                                    border-radius: 50%;
+                                    display: inline-block;
+                                "></span>
+                                ${data}
+                            </span>`;
+                        }
+                        return data;
+                    }
+                }
             ]
         });
     }

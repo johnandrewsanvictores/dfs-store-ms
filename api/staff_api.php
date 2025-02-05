@@ -56,6 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $profile_pic = $_FILES['profile_pic'] ?? null;
         $address = $_POST['address'];
 
+        error_log('Files array: ' . print_r($_FILES, true));
+        error_log('Profile pic: ' . print_r($profile_pic, true));
         if (isset($profile_pic) && $profile_pic['name']) {
             $uploadDir = 'assets/uploads/staff_profile/';
             $fileExtension = pathinfo($profile_pic['name'], PATHINFO_EXTENSION);
