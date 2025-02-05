@@ -32,9 +32,9 @@
                         <i class="fas fa-pencil-alt"></i>
                         <span>Edit</span>
                     </button>
-                    <button id="remove-btn">
-                        <i class="fas fa-trash"></i>
-                        <span>Remove</span>
+                    <button id="view-btn" class="btn btn-secondary">
+                        <i class="fa-solid fa-eye"></i>
+                        <span>View</span>
                     </button>
 
                     <button id="selectAll-btn">

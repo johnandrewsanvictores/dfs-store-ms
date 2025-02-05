@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 const Controls = (function () {
     const new_btn = document.querySelector("#staff-new-btn");
     const edit_btn = document.querySelector("#edit-btn");
-    const remove_btn = document.querySelector("#remove-btn");
+    const view_btn = document.querySelector("#view-btn");
     const select_all = document.querySelector("#selectAll-btn");
     const deselect_all = document.querySelector("#deselect-btn");
 
@@ -23,7 +23,7 @@ const Controls = (function () {
     function add_events() {
         new_btn.addEventListener("click", Staff_Form_Main.add_data_event);
         edit_btn.addEventListener("click", Staff_Form_Main.edit_data_event);
-        remove_btn.addEventListener("click", remove_data_event);
+        view_btn.addEventListener("click", Staff_Form_Main.view_data_event);
         select_all.addEventListener("click", Table.select_all_rows);
         deselect_all.addEventListener("click", Table.deselect_all_selected_row);
         selected_role.addEventListener("change", select_filter_change_event);
@@ -155,10 +155,133 @@ const Staff_Form_Main = (function () {
         Staff_form_functions.show_staff_form(true);
     }
 
+    async function view_data_event(e) {
+        const selected_rows = Table.getSelectedRow(table);
+
+        if (selected_rows.length != 1) {
+            Popup1.show_message('Please ensure only one row is selected.', 'warning');
+            Table.deselect_all_selected_row();
+            return;
+        }
+
+        const data = await Request_Staff.get_specific_staff_acc_data(selected_rows[0].id);
+        show_staff_view_modal(data[0]);
+        Table.deselect_all_selected_row();
+    }
+
+    function show_staff_view_modal(data) {
+        // Format dates
+        const dateAdded = formatDateTime(data.date_added);
+        const lastLogin = data.last_login ? formatDateTime(data.last_login) : 'Never';
+
+        const modal = document.createElement('div');
+        modal.className = 'staff-view-modal';
+        
+        modal.innerHTML = `
+            <div class="staff-view-content">
+                <div class="staff-view-header">
+                    <h2>Staff Profile</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="staff-view-body">
+                    <div class="profile-section">
+                        <div class="profile-image">
+                            <img src="../${data.image_path || 'assets/images/default_profile.png'}" alt="Profile Picture">
+                        </div>
+                        <div class="profile-info">
+                            <h3>${data.name}</h3>
+                            <p class="role">${data.role.toUpperCase()}</p>
+                            <p class="status ${data.status.toLowerCase()}">${data.status}</p>
+                        </div>
+                    </div>
+                    <div class="info-section">
+                        <div class="info-group">
+                            <h4>Contact Information</h4>
+                            <div class="info-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>${data.email || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-phone"></i>
+                                <span>${data.phone_number || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-location-dot"></i>
+                                <span>${data.address || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <h4>Account Details</h4>
+                            <div class="info-item">
+                                <i class="fas fa-id-card"></i>
+                                <span>Staff ID: ${data.staff_id}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-user"></i>
+                                <span>Username: ${data.username}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Date Added: ${dateAdded}</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Last Login: ${lastLogin}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Update close button functionality
+        const closeBtn = modal.querySelector('.close-btn');
+        closeBtn.addEventListener('click', () => {
+            closeModalWithAnimation(modal);
+        });
+
+        // Update outside click functionality
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModalWithAnimation(modal);
+            }
+        });
+    }
+
+    function closeModalWithAnimation(modal) {
+        modal.classList.add('closing');
+        setTimeout(() => {
+            modal.remove();
+        }, 300); // Match animation duration
+    }
+
+    function formatDateTime(dateString) {
+        const date = new Date(dateString);
+        
+        // Format date
+        const formattedDate = date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+
+        // Format time
+        const formattedTime = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        });
+
+        return `${formattedDate} at ${formattedTime}`;
+    }
+
     return {
         add_events,
         add_data_event,
         edit_data_event,
+        view_data_event,
         fill_info
     }
 })();

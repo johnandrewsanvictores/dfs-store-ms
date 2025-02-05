@@ -43,6 +43,9 @@ class Staff_Account_Model
                 8 => 'staff_acc.status',
             ];
 
+            $whereClauses[] = "staff_acc.role != :x";
+            $params[':x'] = "superadmin";
+
             if (isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
                 $search_value = $_POST['search']['value'];
                 $whereClauses[] = "(staff_acc.name LIKE :search OR staff_acc.username LIKE :search)";
