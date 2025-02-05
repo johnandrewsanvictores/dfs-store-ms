@@ -11,7 +11,7 @@ class Staff_Account_Model
         $this->response = array();
     }
 
-    public function get_staff_acc_datatable()
+    public function get_staff_acc_datatable($selected_role, $selected_status)
     {
         try {
 
@@ -23,7 +23,8 @@ class Staff_Account_Model
                     staff_acc.phone_number,
                     staff_acc.role,
                     staff_acc.date_added,
-                    staff_acc.last_login
+                    staff_acc.last_login,
+                    staff_acc.status
                 FROM 
                     staff_acc";
 
@@ -39,6 +40,7 @@ class Staff_Account_Model
                 5 => 'staff_acc.role',
                 6 => 'staff_acc.date_added',
                 7 => 'staff_acc.last_login',
+                8 => 'staff_acc.status',
             ];
 
             if (isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
@@ -47,9 +49,20 @@ class Staff_Account_Model
                 $params[':search'] = "%$search_value%";
             }
 
+            if(isset($selected_role) && $selected_role != '') {
+                $whereClauses[] = "staff_acc.role = :role";
+                $params[':role'] = $selected_role;
+            }
+
+            if(isset($selected_status) && $selected_status != '') {
+                $whereClauses[] = "staff_acc.status = :status";
+                $params[':status'] = $selected_status;
+            }
+
             if (!empty($whereClauses)) {
                 $sql .= " WHERE " . implode(" AND ", $whereClauses);
             }
+
 
             $countSql = "SELECT COUNT(*) FROM (" . $sql . ") AS total";
             $countStmt = $this->pdo->prepare($countSql);
@@ -237,10 +250,27 @@ class Staff_Account_Model
     public function update_staff_acc($staff_id, $name, $username, $pnumber, $role, $password, $email, $status, $profile_pic, $address)
     {
         $sql = "";
+        
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Check if the business exists
+            // Check if the username already exists (excluding current staff)
+            $nameCheckSql = "SELECT COUNT(*) FROM staff_acc WHERE (username = :uname) AND staff_id != :staff_id";
+            $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
+            $nameCheckStmt->bindValue(':uname', $username);
+            $nameCheckStmt->bindValue(':staff_id', $staff_id);
+            $nameCheckStmt->execute();
+
+            // Get the count of matching usernames
+            $exists = $nameCheckStmt->fetchColumn();
+
+            if ($exists > 0) {
+                $this->response['success'] = false;
+                $this->response['message'] = "The Username already exists!";
+                return json_encode($this->response);
+            }
+
+            // Check if the staff exists
             $staff_acc_check_stmt = $this->pdo->prepare("SELECT COUNT(*) FROM staff_acc WHERE staff_id = :id");
             $staff_acc_check_stmt->bindParam(':id', $staff_id);
             $staff_acc_check_stmt->execute();
@@ -251,7 +281,6 @@ class Staff_Account_Model
                 $this->response['message'] = "Staff ID does not exist. " . $staff_id;
                 return json_encode($this->response);
             }
-
 
             $sql = "UPDATE staff_acc 
                                      SET name = :name, username = :uname, phone_number = :pnumber, 

@@ -23,25 +23,47 @@
         <div class="header-staff">
             <h4>Staff Account Management</h4>
             <div class="controls-staff">
-                <button id="staff-new-btn">
-                    <i class="fas fa-plus"></i>
-                    <span>New</span>
-                </button>
-                <button id="edit-btn">
-                    <i class="fas fa-pencil-alt"></i>
-                    <span>Edit</span>
-                </button>
-                <button id="remove-btn">
-                    <i class="fas fa-trash"></i>
-                    <span>Remove</span>
-                </button>
+                <div class="controls-staff-left">
+                    <button id="staff-new-btn">
+                        <i class="fas fa-plus"></i>
+                        <span>New</span>
+                    </button>
+                    <button id="edit-btn">
+                        <i class="fas fa-pencil-alt"></i>
+                        <span>Edit</span>
+                    </button>
+                    <button id="remove-btn">
+                        <i class="fas fa-trash"></i>
+                        <span>Remove</span>
+                    </button>
 
-                <button id="selectAll-btn">
-                    <span>Select All</span>
-                </button>
-                <button id="deselect-btn">
-                    <span>Deselect All</span>
-                </button>
+                    <button id="selectAll-btn">
+                        <span>Select All</span>
+                    </button>
+                    <button id="deselect-btn">
+                        <span>Deselect All</span>
+                    </button>
+                </div>
+
+                <div class="controls-staff-right">
+                    <div class="filter-group">
+                        <label>Role:</label>
+                        <select id="role-filter">
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="cashier">Cashier</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Status:</label>
+                        <select id="status-filter">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -57,42 +79,10 @@
                         <th>Role</th>
                         <th>Date Added</th>
                         <th>Last Login</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-
-                    <tr>
-                        <td></td>
-                        <td>STF001</td>
-                        <td>John Andrew San Victores</td>
-                        <td>Drew</td>
-                        <td>09167003378</td>
-                        <td>Admin</td>
-                        <td>09-12-24</td>
-                        <td>2025-01-11 15:30:45</td>
-                    </tr>
-
-                    <tr>
-                        <td></td>
-                        <td>STF002</td>
-                        <td>Andrew San Victores</td>
-                        <td>Drew</td>
-                        <td>09167003378</td>
-                        <td>Admin</td>
-                        <td>09-12-24</td>
-                        <td>2025-01-11 15:30:45</td>
-                    </tr>
-
-                    <tr>
-                        <td></td>
-                        <td>STF003</td>
-                        <td>John </td>
-                        <td>Drew</td>
-                        <td>09167003378</td>
-                        <td>Cashier</td>
-                        <td>09-12-24</td>
-                        <td>2025-01-11 15:30:45</td>
-                    </tr>
 
                 </tbody>
                 <tfoot>
@@ -105,6 +95,7 @@
                         <th>Role</th>
                         <th>Date Added</th>
                         <th>Last Login</th>
+                        <th>Status</th>
                     </tr>
                 </tfoot>
             </table>

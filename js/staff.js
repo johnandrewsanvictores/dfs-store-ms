@@ -1,4 +1,6 @@
 var table = null;
+const selected_role = document.querySelector("#role-filter");
+const selected_status = document.querySelector("#status-filter");
 
 document.addEventListener("DOMContentLoaded", function () {
     table = Table.initDataTable();
@@ -24,7 +26,8 @@ const Controls = (function () {
         remove_btn.addEventListener("click", remove_data_event);
         select_all.addEventListener("click", Table.select_all_rows);
         deselect_all.addEventListener("click", Table.deselect_all_selected_row);
-
+        selected_role.addEventListener("change", select_filter_change_event);
+        selected_status.addEventListener("change", select_filter_change_event);    
     }
 
     function get_selected_ids() {
@@ -47,6 +50,11 @@ const Controls = (function () {
 
         const ids = get_selected_ids();
         Popup1.show_confirm_dialog(`Are you sure you want to delete ${selected_rows.length} account/s?`, () => Request_Staff.remove_data(ids));
+    }
+
+    function select_filter_change_event() {
+        table.context[0].ajax.data = {'action' : "datatableDisplay", "selected_role" : selected_role.value, "selected_status" : selected_status.value}
+        table.draw();
     }
 
     return {
@@ -171,7 +179,7 @@ const Request_Staff = (function () {
                 if (xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
                     if (response.success) {
-                        table.context[0].ajax.data = { 'action': "datatableDisplay" }
+                        table.context[0].ajax.data = {'action' : "datatableDisplay", "selected_role" : selected_role.value, "selected_status" : selected_status.value}
                         table.draw();
                         Popup1.show_message(response.message, 'success');
                         Staff_form_functions.reset_form();
@@ -200,7 +208,7 @@ const Request_Staff = (function () {
                 if (xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
                     if (response.success) {
-                        table.context[0].ajax.data = { 'action': "datatableDisplay" }
+                        table.context[0].ajax.data = {'action' : "datatableDisplay", "selected_role" : selected_role.value, "selected_status" : selected_status.value}
                         table.draw();
                         Staff_form_functions.reset_form();
                         Staff_form_functions.cancel_form();
@@ -289,7 +297,7 @@ const Table = (function () {
             ajax: {
                 url: "../api/staff_api.php",
                 type: "post",
-                data: { 'action': "datatableDisplay" },
+                data: { 'action': "datatableDisplay", "selected_role" : selected_role.value, "selected_status" : selected_status.value },
             },
             // ajax: "../../api/business_datatable_api.php",
             "columns": [
@@ -301,6 +309,7 @@ const Table = (function () {
                 { "data": "role" },
                 { "data": "date_added" },
                 { "data": "last_login" },
+                { "data": "status" }
             ]
         });
     }

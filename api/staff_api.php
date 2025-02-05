@@ -5,7 +5,9 @@ require '../models/Staff_model.php';
 $staff_acc_model = new Staff_Account_Model($connection);
 
 if (isset($_POST['action']) && $_POST['action'] == "datatableDisplay") {
-    $output = $staff_acc_model->get_staff_acc_datatable();
+    $selected_role = $_POST['selected_role'];
+    $selected_status = $_POST['selected_status'];
+    $output = $staff_acc_model->get_staff_acc_datatable($selected_role, $selected_status);
 
     echo $output;
     exit();
@@ -51,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $email = $_POST['email'];
         $status = $_POST['status'];
-        $profile_pic = $_FILES['profile_pic'];
+        $profile_pic = $_FILES['profile_pic'] ?? null;
         $address = $_POST['address'];
 
         if (isset($profile_pic) && $profile_pic['name']) {
@@ -74,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $image_path = $_POST['old-img-src'] ?? null;
         }
 
-        $response = $staff_acc_model->update_staff_acc($staff_id, $name, $username, $phone_number, $role, $password, $email, $status, $profile_pic, $address);
+        $response = $staff_acc_model->update_staff_acc($staff_id, $name, $username, $phone_number, $role, $password, $email, $status, $image_path, $address);
         echo $response;
         return $response;
     }
