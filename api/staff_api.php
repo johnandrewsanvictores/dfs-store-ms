@@ -29,7 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = $_POST['password'];
         $staff_id = $staff_acc_model->generate_next_staff_id();
 
-        $response = $staff_acc_model->add_staff_acc($staff_id, $name, $username, $phone_number, $role, $password);
+        $email = $_POST['email'];
+        $status = $_POST['status'];
+        $profile_pic = $_FILES['profile_pic'];
+        $address = $_POST['address'];
+
+        $response = $staff_acc_model->add_staff_acc($staff_id, $name, $username, $phone_number, $role, $password, $email, $status, $profile_pic, $address);
 
         echo $response;
         return $response;
@@ -43,6 +48,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $phone_number = $_POST['pnumber'];
         $role = $_POST['role'];
         $password = $_POST['password'];
+
+        $email = $_POST['email'];
+        $status = $_POST['status'];
+        $profile_pic = $_FILES['profile_pic'];
+        $address = $_POST['address'];
+
 
         $response = $staff_acc_model->update_staff_acc($staff_id, $name, $username, $phone_number, $role, $password);
         echo $response;

@@ -102,7 +102,7 @@ class Staff_Account_Model
         }
     }
 
-    public function add_staff_acc($staff_id, $name, $username, $phone_number, $role, $password)
+    public function add_staff_acc($staff_id, $name, $username, $phone_number, $role, $password, $email, $status, $profile_pic, $address)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -123,22 +123,37 @@ class Staff_Account_Model
                 return json_encode($this->response);
             }
 
-            $stmt = $this->pdo->prepare("INSERT INTO staff_acc (staff_id, name, username, phone_number, role, password)
-                                     VALUES (:staff_id, :name, :uname, :pnumber, :role, :password)");
+            $image_path = 'assets/uploads/staff_profile/';
+            $unique_image_name = uniqid() . '_' . basename($profile_pic['name']);
+            $image_path = $image_path . $unique_image_name;
 
-            $password_hash = password_hash($password, PASSWORD_BCRYPT);
+            if (!move_uploaded_file($profile_pic['tmp_name'], "../" . $image_path)) {
+                $this->response['success'] = false;
+                $this->response['message'] = "Error Uploading Image";
+            } else {
+                
 
-            $stmt->bindParam(':staff_id', $staff_id);
-            $stmt->bindParam(':name', $name);
-            $stmt->bindParam(':uname', $username);
-            $stmt->bindParam(':pnumber', $phone_number);
-            $stmt->bindParam(':role', $role);
-            $stmt->bindParam(':password', $password_hash);
+                $stmt = $this->pdo->prepare("INSERT INTO staff_acc (staff_id, name, username, phone_number, role, password, image_path, email, status, address)
+                                        VALUES (:staff_id, :name, :uname, :pnumber, :role, :password, :image_path, :email, :status, :address)");
 
-            $stmt->execute();
+                $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-            $this->response['success'] = true;
-            $this->response['message'] = "Staff account data added successfully.";
+                $stmt->bindParam(':staff_id', $staff_id);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':uname', $username);
+                $stmt->bindParam(':pnumber', $phone_number);
+                $stmt->bindParam(':role', $role);
+                $stmt->bindParam(':password', $password_hash);
+                $stmt->bindParam(':image_path', $image_path);
+                $stmt->bindParam(':email', $email);
+                $stmt->bindParam(':status', $status);
+                $stmt->bindParam(':address', $address);
+
+                $stmt->execute();
+
+                $this->response['success'] = true;
+                $this->response['message'] = "Staff account data added successfully.";
+            }
         } catch (PDOException $e) {
             $this->response['success'] = false;
             $this->response['message'] = "Error adding Staff account data: " . $e->getMessage();
