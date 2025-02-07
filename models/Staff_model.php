@@ -52,12 +52,12 @@ class Staff_Account_Model
                 $params[':search'] = "%$search_value%";
             }
 
-            if(isset($selected_role) && $selected_role != '') {
+            if (isset($selected_role) && $selected_role != '') {
                 $whereClauses[] = "staff_acc.role = :role";
                 $params[':role'] = $selected_role;
             }
 
-            if(isset($selected_status) && $selected_status != '') {
+            if (isset($selected_status) && $selected_status != '') {
                 $whereClauses[] = "staff_acc.status = :status";
                 $params[':status'] = $selected_status;
             }
@@ -253,7 +253,7 @@ class Staff_Account_Model
     public function update_staff_acc($staff_id, $name, $username, $pnumber, $role, $password, $email, $status, $profile_pic, $address)
     {
         $sql = "";
-        
+
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
