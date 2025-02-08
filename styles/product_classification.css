@@ -4,7 +4,7 @@
     gap: 1em;
 }
 
-#csf-new-btn {
+.controls-left button {
     font-size: var(--small);
     padding: 0.5em 1em;
     color: var(--font-white);
@@ -14,12 +14,30 @@
     border-radius: 5px;
     margin-bottom: 1em;
     font-family: inherit;
-    background-color: var(--primary);
     width: 8em;
+}
+
+#csf-new-btn {
+    background-color: var(--primary);
 }
 
 #csf-new-btn:hover {
     background-color: var(--primary-hover-color);
+}
+
+#selectAll-btn, #deselect-btn {
+    background-color: var(--secondary);
+    color: var(--font-white);
+    border: none;
+    border-radius: 5px;
+    padding: 0.5em 1em;
+    font-size: var(--small);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#selectAll-btn:hover, #deselect-btn:hover {
+    background-color: var(--secondary-hover-color);
 }
 
 .text-table-container {
@@ -197,9 +215,8 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
-    display: flex;
-    flex-direction: column ;
-    align-items: center;
+    display: grid;
+    align-content: space-between;
 }
 
 

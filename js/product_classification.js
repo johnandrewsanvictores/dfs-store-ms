@@ -129,9 +129,9 @@ const ProductClassification = (function() {
         `;
 
         if (classification === 'color') {
-            cardContent += `<h3>${item.hex_value}</h3>`;
+            cardContent += `<div style="display:flex;justify-content:center"><h3>${item.hex_value}</h3></div>`;
         } else {
-            cardContent += `<h3 class="category-name" data-tooltip="Click to view brands of ${item[`${classification}_name`]}">${item[`${classification}_name`]}</h3>`;
+            cardContent += `<div style="display:flex;justify-content:center"><h3 ${classification === 'category' && `class="category-name" data-tooltip="Click to view brands of ${item[`${classification}_name`]}"`}>${item[`${classification}_name`]}</h3></div>`;
         }
 
         if (classification === 'category' || classification === 'brand') {
@@ -318,9 +318,36 @@ const ProductClassification = (function() {
 
 const Controls = (function() {
     const new_btn = document.querySelector("#csf-new-btn");
+    const select_all_btn = document.getElementById("selectAll-btn");
+    const deselect_all_btn = document.getElementById("deselect-btn");
+    const cardContainer = document.getElementById('card-container');
+    const removeSelectedBtn = document.getElementById('remove-selected-btn');
+    const changeStatusSelectedBtn = document.getElementById('change-status-selected-btn');
 
     function add_events() {
         new_btn.addEventListener("click", Csf_form_main.add_data_event);
+        select_all_btn.addEventListener("click", select_all_btn_event);
+        deselect_all_btn.addEventListener("click", deselect_all_btn_event);
+    }
+
+    function select_all_btn_event() {
+        const checkboxes = cardContainer.querySelectorAll('.select-checkbox');
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+        update_action_buttons(checkboxes.length);
+    }
+
+    function deselect_all_btn_event() {
+        const checkboxes = cardContainer.querySelectorAll('.select-checkbox');
+        checkboxes.forEach(checkbox => checkbox.checked = false);
+        update_action_buttons(0);
+    }
+
+    function update_action_buttons(selectedCount) {
+        removeSelectedBtn.textContent = `Remove selected (${selectedCount})`;
+        removeSelectedBtn.disabled = selectedCount === 0;
+
+        changeStatusSelectedBtn.textContent = `Change Status selected (${selectedCount})`;
+        changeStatusSelectedBtn.disabled = selectedCount === 0;
     }
 
     return {

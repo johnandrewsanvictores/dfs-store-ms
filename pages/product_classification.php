@@ -25,6 +25,13 @@
                         <i class="fas fa-plus"></i>
                         <span>New</span>
                     </button>
+
+                    <button id="selectAll-btn">
+                        <span>Select All</span>
+                    </button>
+                    <button id="deselect-btn">
+                        <span>Deselect All</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -77,6 +84,14 @@
 
     <script src="../js/classification_form.js"></script>
     <script src="../js/product_classification.js"></script>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(el => {
+            el.classList.remove("navlink-active");
+        });
+
+        document.querySelector('a[href="product_classification.php"]').classList.add('navlink-active');
+    </script>
 
 </body>
 
