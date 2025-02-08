@@ -45,9 +45,19 @@
         </div>
 
         <div class="list-header">
-            <h5 id="list-title">List of Categories</h5>
-            <div class="list-controls">
+            <div style="display: flex; align-items: center; gap: 1em;">
+                <h5 id="list-title">List of Categories</h5>
                 <input type="search" id="search-input" placeholder="Search...">
+            </div>
+            <div class="list-controls">
+                <div class="filter-group category-type-filter" style="display: none;">
+                    <label>Category Type:</label>
+                    <select id="category-type-dropdown">
+                        <option value="">All Types</option>
+                        <option value="physical">Physical</option>
+                        <option value="online">Online</option>
+                    </select>
+                </div>
 
                 <div class="filter-group">
                     <label>Sort:</label>

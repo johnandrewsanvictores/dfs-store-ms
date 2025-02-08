@@ -12,7 +12,7 @@ class Classification_Model
     }
 
     // Get all items based on the classification type
-    public function get_all_items($classification_type, $name_field, $search = '', $sort = 'default', $status = '', $category_id = null)
+    public function get_all_items($classification_type, $name_field, $search = '', $sort = 'default', $status = '', $category_id = null, $category_type = null)
     {
         $params = [];
         $conditions = [];
@@ -44,6 +44,12 @@ class Classification_Model
                 $conditions[] = "status = :status";
                 $params[':status'] = $status;
             }
+
+            if (!empty($category_type)) {
+                $conditions[] = "category_type = :category_type";
+                $params[':category_type'] = $category_type;
+            }
+
 
             // Combine conditions with the base SQL query
             if (!empty($conditions)) {

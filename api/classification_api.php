@@ -125,6 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action'])) {
     $search = $_GET['search'] ?? '';
     $sort = $_GET['sort'] ?? 'default';
     $status = $_GET['status'] ?? '';
+    $categoryType = $_GET['categoryType'] ?? '';
 
     if ($_GET['action'] == "get_specific_data") {
         $id = $_GET['id'];
@@ -139,7 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action'])) {
     }
 
     if ($_GET['action'] == "get_all_categorys") {
-        $response = $classification_model->get_all_items('category', 'category_name', $search, $sort, $status);
+        $response = $classification_model->get_all_items('category', 'category_name', $search, $sort, $status, null, $categoryType);
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_all_brands") {

@@ -2,6 +2,14 @@ document.addEventListener("DOMContentLoaded", function() {
     ProductClassification.init();
     Controls.add_events();
     Csf_form_main.add_events();
+
+    // Show category type filter if the default tab is "Category"
+    const defaultTab = document.querySelector('.filter-tab[data-filter="category"]');
+    const categoryTypeFilter = document.querySelector('.category-type-filter');
+
+    if (defaultTab.classList.contains('active')) {
+        categoryTypeFilter.style.display = 'flex';
+    }
 });
 
 const ProductClassification = (function() {
@@ -12,8 +20,10 @@ const ProductClassification = (function() {
         sortValue: 'default',
         filterStatus: '', // Add filter status
         categoryId: null,
-        categoryName: ''
+        categoryName: '',
+        categoryType: ''
     };
+
 
     function init() {
         load_classifications('category');
@@ -21,6 +31,7 @@ const ProductClassification = (function() {
         setup_remove_selected_btn();
         setup_search_and_sort(); // Add new setup function
         setup_filter_status(); // Add new setup function
+        setup_category_type_filter();
     }
 
     function setup_search_and_sort() {
@@ -50,6 +61,16 @@ const ProductClassification = (function() {
         });
     }
 
+    function setup_category_type_filter() {
+        const categoryTypeSelect = document.querySelector('#category-type-dropdown');
+
+        categoryTypeSelect.addEventListener('change', () => {
+            state.categoryType = categoryTypeSelect.value;
+            load_classifications(state.currentClassification, state.categoryId, state.categoryName);
+        });
+    }
+
+
     function load_classifications(classification, categoryId = null, categoryName = '') {
         state.currentClassification = classification; // Ensure classification is set
         state.categoryId = categoryId;
@@ -61,8 +82,10 @@ const ProductClassification = (function() {
         const params = new URLSearchParams({
             search: state.searchTerm,
             sort: state.sortValue,
-            status: state.filterStatus
+            status: state.filterStatus,
+            categoryType: state.categoryType
         });
+
 
         if (classification === 'brand' && categoryId) {
             url = `../api/classification_api.php?action=get_brands_by_category&category_id=${categoryId}`;
@@ -118,7 +141,7 @@ const ProductClassification = (function() {
 
     function create_card(item, classification) {
         const card = document.createElement('div');
-        card.classList.add('card', item.status === 'active' ? 'card-active' : 'card-inactive')
+        card.classList.add('card', item.status === 'active' ? 'card-active' : 'card-inactive');
         let cardContent = `
             <div class="checkbox-container">
                 <input type="checkbox" class="select-checkbox" data-id="${classification}-${item.id}">
@@ -134,7 +157,14 @@ const ProductClassification = (function() {
             cardContent += `<div style="display:flex;justify-content:center"><h3 ${classification === 'category' && `class="category-name" data-tooltip="Click to view brands of ${item[`${classification}_name`]}"`}>${item[`${classification}_name`]}</h3></div>`;
         }
 
-        if (classification === 'category' || classification === 'brand') {
+        if (classification === 'category') {
+            cardContent += `
+                <div class="category-type-indicator">
+                    <span class="category-type ${item.category_type}">${item.category_type.charAt(0).toUpperCase() + item.category_type.slice(1)}</span>
+                </div>
+                <img src="../${item.image_path}" alt="${item[`${classification}_name`]}" class="card-image">
+            `;
+        } else if (classification === 'brand') {
             cardContent += `<img src="../${item.image_path}" alt="${item[`${classification}_name`]}" class="card-image">`;
         }
 
@@ -180,13 +210,13 @@ const ProductClassification = (function() {
             change_status(classification, [id]);
         });
 
-
-
         return card;
     }
 
     function setup_filter_tabs() {
         const filterTabs = document.querySelectorAll('.filter-tab');
+        const categoryTypeFilter = document.querySelector('.category-type-filter');
+
         filterTabs.forEach(tab => {
             tab.addEventListener('click', function() {
                 filterTabs.forEach(t => t.classList.remove('active'));
@@ -194,6 +224,13 @@ const ProductClassification = (function() {
                 const classification = this.getAttribute('data-filter');
                 state.currentClassification = classification; // Update current classification
                 load_classifications(classification);
+
+                // Show or hide the category type filter
+                if (classification === 'category') {
+                    categoryTypeFilter.style.display = 'flex';
+                } else {
+                    categoryTypeFilter.style.display = 'none';
+                }
             });
         });
     }

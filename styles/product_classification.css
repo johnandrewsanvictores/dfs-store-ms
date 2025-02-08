@@ -587,6 +587,34 @@ input[type="file"]::file-selector-button:hover {
     white-space: nowrap;
 }
 
+.filter-group select {
+    padding: 0.5em 2.5em 0.5em 1em;
+    font-size: var(--small);
+    border: 1px solid var(--input-bg-color);
+    border-radius: 5px;
+    background-color: var(--input-bg-color);
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.8em center;
+    background-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.filter-group select:hover {
+    border-color: var(--primary);
+    background-color: var(--white-bg);
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--white-bg);
+    box-shadow: 0 0 0 2px var(--tertiary);
+}
+
 .sort-dropdown,
 #status-dropdown {
     padding: 0.5em 2.5em 0.5em 1em;
@@ -680,4 +708,38 @@ input[type="file"]::file-selector-button:hover {
     line-height: 1.4;
 }
 
+.category-type-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.5em;
+}
+
+.category-type {
+    padding: 0.3em 0.6em;
+    border-radius: 5px;
+    font-size: var(--small);
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.category-type.physical {
+    background-color: #e0f7fa;
+    color: #00796b;
+}
+
+.category-type.online {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+}
+
 /* Keep all other existing styles unchanged */
+
+.category-type-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    background-color: var(--white-bg);
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    border: 1px solid var(--stroke-grey);
+}
