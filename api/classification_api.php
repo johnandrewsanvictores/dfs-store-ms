@@ -15,13 +15,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($classification == "category") {
             $category_name = $_POST['category'];
+            $category_type = $_POST['category-type'];
             $category_image = $_FILES['category-image'];
-            $response = $classification_model->add_classification_with_img($classification, $category_name, $category_image);
+            $response = $classification_model->add_classification_with_img($classification, $category_name, $category_image, null, $category_type);
         } else if ($classification == "brand") {
             $brand_name = $_POST['brand'];
             $brand_image = $_FILES['brand-image'];
             $category_id = $_POST['category_id'];
-            $response = $classification_model->add_classification_with_img($classification, $brand_name, $brand_image, $category_id);
+            $response = $classification_model->add_classification_with_img($classification, $brand_name, $brand_image, $category_id, null);
         } else {
             $response = $classification_model->add_classification($classification, $texture, $material, $hex_value);
         }
@@ -35,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($classification == 'category') {
             $name = $_POST['category'];
+            $category_type = $_POST['category-type'];
             if (isset($_FILES['category-image']) && $_FILES['category-image']['name']) {
                 $uploadDir = 'assets/uploads/category/';
                 $fileExtension = pathinfo($_FILES['category-image']['name'], PATHINFO_EXTENSION);
@@ -54,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $image_path = $_POST['old_img_src'] ?? null;
             }
-            $response = $classification_model->update_classification_with_image("category", $id, $name, $image_path);
+            $response = $classification_model->update_classification_with_image("category", $id, $name, $image_path, null, $category_type);
         } else if ($classification == 'brand') {
             $name = $_POST['brand'];
             if (isset($_FILES['brand-image']) && $_FILES['brand-image']['name']) {
@@ -77,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $image_path = $_POST['old_img_src'] ?? null;
             }
             $category_id = $_POST['category_id'];
-            $response = $classification_model->update_classification_with_image("brand", $id, $name, $image_path, $category_id);
+            $response = $classification_model->update_classification_with_image("brand", $id, $name, $image_path, $category_id, null);
         } else {
             // For texture, material, and color
             $texture = null;

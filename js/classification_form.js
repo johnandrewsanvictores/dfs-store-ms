@@ -162,8 +162,9 @@ const Form_Dom_Manipulate = (function() {
 
             case 'category':
                 category_el.value = data.category_name;
-                category_image_preview.src =  "../" +  data.image_path;
+                category_image_preview.src = "../" + data.image_path;
                 category_image_preview.style.display = 'block';
+                document.getElementById('category-type').value = data.category_type;
                 break;
 
             case 'brand':

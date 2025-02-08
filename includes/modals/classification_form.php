@@ -27,6 +27,16 @@
                 <div class="property-name category-container-form">
                     <label for="category">Category Name<span>*</span></label>
                     <input type="text" name="category" value="" id="category" placeholder="Input category name">
+                    <label for="category-type">Category Type<span>*</span></label>
+                    <div class="container">
+                        <div class="select">
+                            <select name="category-type" id="category-type">
+                                <option value="" disabled selected>Select a type</option>
+                                <option value="physical">Physical</option>
+                                <option value="online">Online</option>
+                            </select>
+                        </div>
+                    </div>
                     <label for="category-image">Category Image<span>*</span></label>
                     <input type="file" name="category-image" id="category-image" accept="image/*">
                     <img id="category-image-preview" src="#" alt="Category Image Preview" style="display:none;" />

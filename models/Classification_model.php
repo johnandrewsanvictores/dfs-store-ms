@@ -13,74 +13,74 @@ class Classification_Model
 
     // Get all items based on the classification type
     public function get_all_items($classification_type, $name_field, $search = '', $sort = 'default', $status = '', $category_id = null)
-{
-    $params = [];
-    $conditions = [];
+    {
+        $params = [];
+        $conditions = [];
 
-    try {
-        // Determine the base SQL query based on the classification type
-        if ($classification_type == "category") {
-            $sql = "SELECT * FROM category";
-        } else if ($classification_type == "brand") {
-            if ($category_id) {
-                $sql = "SELECT * FROM brand WHERE category_id = :category_id";
-                $params[':category_id'] = $category_id;
+        try {
+            // Determine the base SQL query based on the classification type
+            if ($classification_type == "category") {
+                $sql = "SELECT * FROM category";
+            } else if ($classification_type == "brand") {
+                if ($category_id) {
+                    $sql = "SELECT * FROM brand WHERE category_id = :category_id";
+                    $params[':category_id'] = $category_id;
+                } else {
+                    $sql = "SELECT * FROM brand";
+                }
             } else {
-                $sql = "SELECT * FROM brand";
+                $sql = "SELECT * FROM classification WHERE classification = :classification";
+                $params[':classification'] = $classification_type;
             }
-        } else {
-            $sql = "SELECT * FROM classification WHERE classification = :classification";
-            $params[':classification'] = $classification_type;
-        }
 
-        // Add search condition if provided
-        if (!empty($search)) {
-            $conditions[] = "{$name_field} LIKE :search";
-            $params[':search'] = "%{$search}%";
-        }
-
-        // Add status condition if provided
-        if (!empty($status)) {
-            $conditions[] = "status = :status";
-            $params[':status'] = $status;
-        }
-
-        // Combine conditions with the base SQL query
-        if (!empty($conditions)) {
-            // Check if the base query already has a WHERE clause
-            if (strpos($sql, 'WHERE') !== false) {
-                // If it already has a WHERE clause, append conditions with AND
-                $sql .= " AND " . implode(" AND ", $conditions);
-            } else {
-                // If it doesn't have a WHERE clause, add WHERE
-                $sql .= " WHERE " . implode(" AND ", $conditions);
+            // Add search condition if provided
+            if (!empty($search)) {
+                $conditions[] = "{$name_field} LIKE :search";
+                $params[':search'] = "%{$search}%";
             }
+
+            // Add status condition if provided
+            if (!empty($status)) {
+                $conditions[] = "status = :status";
+                $params[':status'] = $status;
+            }
+
+            // Combine conditions with the base SQL query
+            if (!empty($conditions)) {
+                // Check if the base query already has a WHERE clause
+                if (strpos($sql, 'WHERE') !== false) {
+                    // If it already has a WHERE clause, append conditions with AND
+                    $sql .= " AND " . implode(" AND ", $conditions);
+                } else {
+                    // If it doesn't have a WHERE clause, add WHERE
+                    $sql .= " WHERE " . implode(" AND ", $conditions);
+                }
+            }
+
+            // Add sorting based on the provided sort option
+            $sortField = match ($sort) {
+                'name-asc' => "{$name_field} ASC",
+                'name-desc' => "{$name_field} DESC",
+                'date-asc' => "created_at ASC",
+                'date-desc' => "created_at DESC",
+                default => "id DESC"
+            };
+            $sql .= " ORDER BY " . $sortField;
+
+            // Prepare and execute the SQL query
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+
+            // Set the response
+            $this->response['success'] = true;
+            $this->response[$classification_type . 's'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->response['success'] = false;
+            $this->response['message'] = "Error retrieving items: " . $e->getMessage();
         }
 
-        // Add sorting based on the provided sort option
-        $sortField = match ($sort) {
-            'name-asc' => "{$name_field} ASC",
-            'name-desc' => "{$name_field} DESC",
-            'date-asc' => "created_at ASC",
-            'date-desc' => "created_at DESC",
-            default => "id DESC"
-        };
-        $sql .= " ORDER BY " . $sortField;
-
-        // Prepare and execute the SQL query
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-
-        // Set the response
-        $this->response['success'] = true;
-        $this->response[$classification_type . 's'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        $this->response['success'] = false;
-        $this->response['message'] = "Error retrieving items: " . $e->getMessage();
+        return json_encode($this->response);
     }
-
-    return json_encode($this->response);
-}
 
     // Get specific item based on the classification type use for edit filling form
     public function get_specific_classification($classification, $id)
@@ -165,7 +165,7 @@ class Classification_Model
     }
 
     // Add new classification with image (category, brand)
-    public function add_classification_with_img($classification, $name, $image, $category_id = null)
+    public function add_classification_with_img($classification, $name, $image, $category_id = null, $category_type = null)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -179,7 +179,7 @@ class Classification_Model
                 $table = "category";
                 $name_field = "category_name";
                 $image_path = 'assets/uploads/category/';
-                $sql = "INSERT INTO category (category_name, image_path) VALUES (:name, :image_path)";
+                $sql = "INSERT INTO category (category_name, image_path, category_type) VALUES (:name, :image_path, :category_type)";
             }
 
             $nameCheckSql = "SELECT COUNT(*) FROM {$table} WHERE {$name_field} = :name";
@@ -210,6 +210,11 @@ class Classification_Model
                 if ($category_id) {
                     $stmt->bindParam(':category_id', $category_id);
                 }
+
+                if ($category_type) {
+                    $stmt->bindParam(':category_type', $category_type);
+                }
+
 
                 $stmt->execute();
                 $this->response['success'] = true;
@@ -286,7 +291,7 @@ class Classification_Model
     }
 
     // Update classification with image (category, brand)
-    public function update_classification_with_image($classification, $id, $name, $image_path = null, $category_id = null)
+    public function update_classification_with_image($classification, $id, $name, $image_path = null, $category_id = null, $category_type = null)
     {
         try {
             if ($classification == "brand") {
@@ -322,6 +327,12 @@ class Classification_Model
                 $sql .= ", category_id = :category_id";
                 $params[':category_id'] = $category_id;
             }
+
+            if ($category_type !== null) {
+                $sql .= ", category_type = :category_type";
+                $params[':category_type'] = $category_type;
+            }
+
 
             $sql .= " WHERE id = :id";
             $stmt = $this->pdo->prepare($sql);
