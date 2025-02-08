@@ -32,6 +32,7 @@
                         <div class="select">
                             <select name="category-type" id="category-type">
                                 <option value="" disabled selected>Select a type</option>
+                                <option value="both">Physical & Online</option>
                                 <option value="physical">Physical</option>
                                 <option value="online">Online</option>
                             </select>

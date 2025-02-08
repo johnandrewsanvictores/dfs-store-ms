@@ -160,7 +160,7 @@ const ProductClassification = (function() {
         if (classification === 'category') {
             cardContent += `
                 <div class="category-type-indicator">
-                    <span class="category-type ${item.category_type}">${item.category_type.charAt(0).toUpperCase() + item.category_type.slice(1)}</span>
+                    <span class="category-type ${item.category_type}">${item.category_type === 'both' ? 'Physical & Online' : item.category_type.charAt(0).toUpperCase() + item.category_type.slice(1)}</span>
                 </div>
                 <img src="../${item.image_path}" alt="${item[`${classification}_name`]}" class="card-image">
             `;
