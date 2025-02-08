@@ -17,12 +17,16 @@
     <?php include('../includes/navbar.php'); ?>
 
     <main class="main">
-        <div class="header-classification">
+        <div class="classification-header">
             <h4>Online Product Classification</h4>
-            <button id="csf-new-btn">
-                <i class="fas fa-plus"></i>
-                <span>New</span>
-            </button>
+            <div class="controls-container">
+                <div class="controls-left">
+                    <button id="csf-new-btn">
+                        <i class="fas fa-plus"></i>
+                        <span>New</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="filter-tabs">
@@ -33,34 +37,36 @@
             <button class="filter-tab" data-filter="color">Color</button>
         </div>
 
-        <div class="title-search-sort-container">
+        <div class="list-header">
             <h5 id="list-title">List of Categories</h5>
-            <div class="search-sort-container">
-                <input type="text" id="search-input" placeholder="Search..." class="search-input">
-                <div class="filter-status-dropdown-container">
-                    <select class="filter-status-dropdown">
-                        <option value="">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="sort-dropdown-container">
+            <div class="list-controls">
+                <input type="search" id="search-input" placeholder="Search...">
+
+                <div class="filter-group">
+                    <label>Sort:</label>
                     <select class="sort-dropdown">
                         <option value="default">Default</option>
                         <option value="name-asc">Name (A-Z)</option>
                         <option value="name-desc">Name (Z-A)</option>
                         <option value="date-asc">Oldest First</option>
-                        <option value="date-desc">Newest First</option>
                     </select>
-                    <i class="fas fa-sort"></i>
+                </div>
+
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="status-dropdown">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                 </div>
             </div>
         </div>
 
-        <button class="remove-selected-btn" id="remove-selected-btn" disabled>Remove selected (0)</button>
-        <button class="remove-selected-btn" id="remove-selected-btn" disabled>Change Status selected (0)</button>
-
+        <div class="action-buttons">
+            <button id="remove-selected-btn" disabled>Remove selected (0)</button>
+            <button id="change-status-selected-btn" disabled>Change Status selected (0)</button>
+        </div>
 
         <div class="card-container" id="card-container">
             <!-- Cards will be dynamically inserted here -->

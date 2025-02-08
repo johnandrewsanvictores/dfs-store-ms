@@ -123,13 +123,6 @@
     margin-bottom: 2em;
 }
 
-.table-wrapper h5 {
-    text-align: center;
-    margin-bottom: 0.5em;
-    background-color: var(--input-bg-color);
-    padding: 0.5em;
-    border-radius: 5px;
-}
 
 .color-preview {
     width: 20px;
@@ -204,7 +197,11 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
+    display: flex;
+    flex-direction: column ;
+    align-items: center;
 }
+
 
 .card:hover {
     transform: translateY(-5px);
@@ -270,6 +267,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .card .checkbox-container {
@@ -288,12 +286,49 @@
     color: var(--font-white);
 }
 
+.card .status-active,
+.card .status-inactive {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;   
+    letter-spacing: 0.3px;
+    text-transform: capitalize;
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
 .card .status-active {
-    background-color: var(--green);
+    background-color: #e3fcef;
+    color: #14804a;
+    border: 1px solid #14804a30;
+    box-shadow: 0 0 10px rgba(20, 128, 74, 0.2);
+    transform: scale(1.05);
 }
 
 .card .status-inactive {
-    background-color: var(--red);
+    background-color: #ffe5e5;
+    color: #d12c2c;
+    border: 1px solid #d12c2c30;
+    opacity: 0.8;
+    filter: grayscale(50%);
+}
+
+.card-active {
+    background-color: #f5f5f5;
+    color: #14804a;
+    border: 1px solid #14804a30;
+    box-shadow: 0 0 10px rgba(20, 128, 74, 0.2); /* Add shadow for active */
+}
+
+.card-inactive {
+    background-color: #fff3f3;
+    color: #d12c2c;
+    border: 1px solid #d12c2c30;
+    opacity: 0.8; /* Make inactive cards slightly transparent */
+    filter: grayscale(50%); /* Add grayscale effect to inactive */
 }
 
 .search-sort-container {
@@ -302,12 +337,35 @@
     margin-bottom: 1em;
 }
 
-.search-input {
-    padding: 0.5em;
-    font-size: var(--body);
-    border: 1px solid var(--stroke-grey);
-    border-radius: 5px;
-    width: 200px;
+/* Style the search input */
+#search-input {
+    padding: 0.8em 2.5em;
+    border: none;
+    border-radius: 50px;
+    font-size: var(--small);
+    min-width: 300px;
+    background-color: var(--input-bg-color);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3ccircle cx='11' cy='11' r='8'%3e%3c/circle%3e%3cline x1='21' y1='21' x2='16.65' y2='16.65'%3e%3c/line%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: 12px center;
+    background-size: 18px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#search-input::placeholder {
+    color: #666;
+}
+
+#search-input:hover {
+    background-color: #f8f8f8;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+#search-input:focus {
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .sort-button {
@@ -393,21 +451,23 @@
     color: var(--primary);
 }
 
-.remove-selected-btn {
-    font-size: var(--small);
+#remove-selected-btn, #change-status-selected-btn {
     padding: 0.5em 1em;
-    color: var(--font-white);
-    cursor: pointer;
-    outline: none;
-    border: 1px solid var(--stroke-grey);
     border-radius: 5px;
-    background-color: var(--red);
-    font-family: inherit;
-    margin-bottom: 1em;
+    font-size: var(--small);
+    cursor: pointer;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--font-dark);
+    border: 1px solid var(--stroke-grey);
 }
 
-.remove-selected-btn:hover {
-    background-color: var(--red-hover-color);
+#remove-selected-btn:disabled,
+#change-status-selected-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--font-grey);
 }
 
 input[type="file"] {
@@ -471,3 +531,136 @@ input[type="file"]::file-selector-button:hover {
     pointer-events: none;
     color: var(--stroke-grey);
 }
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.list-controls {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+.list-controls input[type="search"] {
+    padding: 0.5em 1em;
+    border: 1px solid var(--stroke-grey);
+    border-radius: 5px;
+    font-size: var(--small);
+    min-width: 200px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    background-color: var(--white-bg);
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    border: 1px solid var(--stroke-grey);
+}
+
+.filter-group label {
+    color: var(--font-dark);
+    font-size: var(--small);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.sort-dropdown,
+#status-dropdown {
+    padding: 0.5em 2.5em 0.5em 1em;
+    border: 1px solid var(--input-bg-color);
+    border-radius: 5px;
+    font-size: var(--small);
+    color: var(--font-dark);
+    background-color: var(--input-bg-color);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.8em center;
+    background-size: 1em;
+    min-width: 140px;
+    transition: all 0.3s ease;
+}
+
+.sort-dropdown:hover,
+#status-dropdown:hover {
+    border-color: var(--primary);
+    background-color: var(--white-bg);
+}
+
+.sort-dropdown:focus,
+#status-dropdown:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: var(--white-bg);
+    box-shadow: 0 0 0 2px var(--tertiary);
+}
+
+.action-buttons {
+    margin-bottom: 1.5em;
+}
+
+.action-btn {
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    font-size: var(--small);
+    cursor: pointer;
+    border: none;
+}
+
+#remove-selected-btn {
+    background-color: var(--red);
+    color: var(--font-white);
+}
+
+#change-status-selected-btn {
+    background-color: var(--secondary);
+    color: var(--font-white);
+}
+
+/* Style for tooltips - both buttons and titles */
+[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+}
+
+[data-tooltip]:before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    margin-bottom: 5px;
+}
+
+[data-tooltip]:hover:before {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Specific styling for category title tooltip */
+.category-title[data-tooltip]:before {
+    width: max-content;
+    max-width: 200px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* Keep all other existing styles unchanged */

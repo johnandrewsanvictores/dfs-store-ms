@@ -41,7 +41,7 @@ const ProductClassification = (function() {
     }
 
     function setup_filter_status() {
-        const filterSelect = document.querySelector('.filter-status-dropdown');
+        const filterSelect = document.querySelector('#status-dropdown');
 
         // Filter change
         filterSelect.addEventListener('change', () => {
@@ -102,6 +102,7 @@ const ProductClassification = (function() {
                           }`;
                     }
                     reset_remove_selected_btn();
+                    reset_change_status_selected_btn();
                 } catch (e) {
                     console.error('Error parsing JSON:', e);
                 }
@@ -117,7 +118,7 @@ const ProductClassification = (function() {
 
     function create_card(item, classification) {
         const card = document.createElement('div');
-        card.classList.add('card');
+        card.classList.add('card', item.status === 'active' ? 'card-active' : 'card-inactive')
         let cardContent = `
             <div class="checkbox-container">
                 <input type="checkbox" class="select-checkbox" data-id="${classification}-${item.id}">
@@ -130,7 +131,7 @@ const ProductClassification = (function() {
         if (classification === 'color') {
             cardContent += `<h3>${item.hex_value}</h3>`;
         } else {
-            cardContent += `<h3 class="${classification === 'category' ? 'category-name' : ''}">${item[`${classification}_name`]}</h3>`;
+            cardContent += `<h3 class="category-name" data-tooltip="Click to view brands of ${item[`${classification}_name`]}">${item[`${classification}_name`]}</h3>`;
         }
 
         if (classification === 'category' || classification === 'brand') {
@@ -139,9 +140,9 @@ const ProductClassification = (function() {
 
         cardContent += `
             <div class="card-color-info"><div class="actions">
-                <button class="edit-btn" id="${classification}-${item.id}"><i class="fas fa-edit"></i></button>
-                <button class="delete-btn" id="${classification}-${item.id}"><i class="fas fa-trash-alt"></i></button>
-                <button class="status-btn" id="${classification}-${item.id}"><i class="fas fa-exchange-alt"></i></button>
+                <button class="edit-btn" id="${classification}-${item.id}" data-tooltip="Edit"><i class="fas fa-edit"></i></button>
+                <button class="delete-btn" id="${classification}-${item.id}" data-tooltip="Delete"><i class="fas fa-trash-alt"></i></button>
+                <button class="status-btn" id="${classification}-${item.id}" data-tooltip="Change Status"><i class="fas fa-exchange-alt"></i></button>
             </div>
         `;
 
@@ -199,13 +200,19 @@ const ProductClassification = (function() {
 
     function setup_remove_selected_btn() {
         const removeSelectedBtn = document.getElementById('remove-selected-btn');
+        const changeStatusSelectedBtn = document.getElementById('change-status-selected-btn');
         const cardContainer = document.getElementById('card-container');
 
         cardContainer.addEventListener('change', function() {
             const selectedCheckboxes = cardContainer.querySelectorAll('.select-checkbox:checked');
+
             removeSelectedBtn.textContent = `Remove selected (${selectedCheckboxes.length})`;
             removeSelectedBtn.disabled = selectedCheckboxes.length === 0;
+
+            changeStatusSelectedBtn.textContent = `Change Status selected (${selectedCheckboxes.length})`;
+            changeStatusSelectedBtn.disabled = selectedCheckboxes.length === 0;
         });
+
 
         removeSelectedBtn.addEventListener('click', function() {
             const selectedCheckboxes = cardContainer.querySelectorAll('.select-checkbox:checked');
@@ -219,13 +226,34 @@ const ProductClassification = (function() {
                 delete_items(classification, ids.map(id => id.split('-')[1]));
             });
         });
+
+        changeStatusSelectedBtn.addEventListener('click', function() {
+            const selectedCheckboxes = cardContainer.querySelectorAll('.select-checkbox:checked');
+            const ids = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute('data-id'));
+            if (ids.length === 0) {
+                return;
+            }
+            let message = `Are you sure you want to change the status of the selected items?`;
+            Popup1.show_confirm_dialog(message, function() {
+                const classification = ids[0].split('-')[0];
+                change_status(classification, ids.map(id => id.split('-')[1]));
+            });
+        });
     }
+
 
     function reset_remove_selected_btn() {
         const removeSelectedBtn = document.getElementById('remove-selected-btn');
         removeSelectedBtn.textContent = `Remove selected (0)`;
         removeSelectedBtn.disabled = true;
     }
+
+    function reset_change_status_selected_btn() {
+        const changeStatusSelectedBtn = document.getElementById('change-status-selected-btn');
+        changeStatusSelectedBtn.textContent = `Change Status selected (0)`;
+        changeStatusSelectedBtn.disabled = true;
+    }
+
 
     function delete_items(classification, ids) {
         console.log('Deleting items:', classification, );
