@@ -732,13 +732,7 @@ input[type="file"]::file-selector-button:hover {
     color: #6a1b9a;
 }
 
-.category-type.both {
-    background-color: #eeead1;
-    color: #793700;
-}
-
 /* Keep all other existing styles unchanged */
-
 
 .category-type-filter {
     display: flex;

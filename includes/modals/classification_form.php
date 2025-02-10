@@ -32,9 +32,9 @@
                         <div class="select">
                             <select name="category-type" id="category-type">
                                 <option value="" disabled selected>Select a type</option>
-                                <option value="both">Physical & Online</option>
                                 <option value="physical">Physical</option>
                                 <option value="online">Online</option>
+                                <option value="both">Physical & Online</option>
                             </select>
                         </div>
                     </div>
@@ -69,15 +69,25 @@
                     <input type="text" name="material" value="" id="material" placeholder="Input material name">
                 </div>
 
-                <div class="color-form-container">
-                    <label for="color">Hex Value<span>*</span></label>
-                    <input type="text" name="hexvalue" value="" id="hexvalue" placeholder="Input hexvalue or select color">
+
+                <div class="property-name color-main-container">
+                    <div>
+                        <label for="color-name">Color Name<span>*</span></label>
+                        <input type="text" name="color-name" id="color-name">
+                    </div>
+                    <div class="select-color-input">
+                        <div class="color-form-container">
+                            <label for="color">Hex Value<span>*</span></label>
+                            <input type="text" name="hexvalue" value="" id="hexvalue" placeholder="Input hexvalue or select color">
+                        </div>
+
+                        <div class="color-input">
+                            <label for="color">Select Color</label>
+                            <input type="color" name="color" id="color">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="color-input">
-                    <label for="color">Select Color</label>
-                    <input type="color" name="color" id="color">
-                </div>
 
             </div>
             <button type="submit" id="classification-add-btn">Add</button>
@@ -211,10 +221,35 @@
         gap: 0.4em;
     }
 
+    .color-main-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    .select-color-input {
+        display: flex;
+        flex-direction: row-reverse;
+        gap: 1em;
+    }
+
+    .color-input input {
+        width: 100%;
+        cursor: pointer;
+    }
+
+    .color-main-container label {
+        font-size: var(--small);
+    }
+
+    .color-main-container label span {
+        color: var(--red);
+    }
+
     .color-input {
-        margin-left: -1em;
         display: flex;
         gap: 0.5em;
+        flex-direction: column;
     }
 
     .form-content>div>label {
@@ -234,7 +269,6 @@
         padding: 1em 1.5em;
         font-size: var(--small);
         color: inherit;
-        height: 100%;
     }
 
     #product-property-form input[type="color"] {
@@ -270,8 +304,6 @@
     }
 
     .property-name,
-    .color-form-container,
-    .color-input,
     .category-container-form,
     .brand-container-form {
         display: none;

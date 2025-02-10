@@ -121,7 +121,7 @@ class Classification_Model
     }
 
     // Add new classification (texture, material, color)
-    public function add_classification($classification, $texture, $material, $hex_value = null)
+    public function add_classification($classification, $texture, $material, $hex_value = null, $color_name = null)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -135,9 +135,10 @@ class Classification_Model
                 $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
                 $nameCheckStmt->bindValue(':material', $material);
             } elseif ($classification == 'color') {
-                $nameCheckSql = "SELECT COUNT(*) FROM classification WHERE hex_value = :hex_value AND :hex_value IS NOT NULL";
+                $nameCheckSql = "SELECT COUNT(*) FROM classification WHERE hex_value = :hex_value AND :hex_value IS NOT NULL AND color_name = :color_name";
                 $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
                 $nameCheckStmt->bindValue(':hex_value', $hex_value);
+                $nameCheckStmt->bindValue(':color_name', $color_name);
             } else {
                 $this->response['success'] = false;
                 $this->response['message'] = "Invalid classification type." . $classification;
@@ -153,11 +154,12 @@ class Classification_Model
                 return json_encode($this->response);
             }
 
-            $stmt = $this->pdo->prepare("INSERT INTO classification (classification, texture_name, material_name, hex_value) VALUES (:classification, :texture_name, :material_name, :hex_value)");
+            $stmt = $this->pdo->prepare("INSERT INTO classification (classification, texture_name, material_name, hex_value, color_name) VALUES (:classification, :texture_name, :material_name, :hex_value, :color_name)");
             $stmt->bindParam(':classification', $classification);
             $stmt->bindParam(':texture_name', $texture);
             $stmt->bindParam(':material_name', $material);
             $stmt->bindParam(':hex_value', $hex_value);
+            $stmt->bindParam(':color_name', $color_name);
 
             $stmt->execute();
 
@@ -234,7 +236,7 @@ class Classification_Model
     }
 
     // Update classification (texture, material, color)
-    public function update_classification($id, $classification, $texture = null, $material = null, $hex_value = null)
+    public function update_classification($id, $classification, $texture = null, $material = null, $hex_value = null, $color_name)
     {
         try {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -249,9 +251,10 @@ class Classification_Model
                 $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
                 $nameCheckStmt->bindValue(':name', $material);
             } elseif ($classification == 'color' && $hex_value) {
-                $nameCheckSql = "SELECT COUNT(*) FROM classification WHERE hex_value = :name AND id != :id";
+                $nameCheckSql = "SELECT COUNT(*) FROM classification WHERE hex_value = :name AND color_name = :cname AND id != :id ";
                 $nameCheckStmt = $this->pdo->prepare($nameCheckSql);
                 $nameCheckStmt->bindValue(':name', $hex_value);
+                $nameCheckStmt->bindValue(':cname', $color_name);
             }
 
             if (isset($nameCheckStmt)) {
@@ -275,8 +278,9 @@ class Classification_Model
                 $sql .= ", material_name = :material_name, texture_name = NULL, hex_value = NULL";
                 $params[':material_name'] = $material;
             } elseif ($classification == 'color') {
-                $sql .= ", hex_value = :hex_value, texture_name = NULL, material_name = NULL";
+                $sql .= ", hex_value = :hex_value, color_name = :color_name, texture_name = NULL, material_name = NULL";
                 $params[':hex_value'] = $hex_value;
+                $params[':color_name'] = $color_name;
             }
 
             $sql .= " WHERE id = :id";

@@ -152,7 +152,7 @@ const ProductClassification = (function() {
         `;
 
         if (classification === 'color') {
-            cardContent += `<div style="display:flex;justify-content:center"><h3>${item.hex_value}</h3></div>`;
+            cardContent += `<div style="display:flex;justify-content:center"><h3>${item.color_name}</h3></div>`;
         } else {
             cardContent += `<div style="display:flex;justify-content:center"><h3 ${classification === 'category' && `class="category-name" data-tooltip="Click to view brands of ${item[`${classification}_name`]}"`}>${item[`${classification}_name`]}</h3></div>`;
         }
@@ -160,7 +160,7 @@ const ProductClassification = (function() {
         if (classification === 'category') {
             cardContent += `
                 <div class="category-type-indicator">
-                    <span class="category-type ${item.category_type}">${item.category_type === 'both' ? 'Physical & Online' : item.category_type.charAt(0).toUpperCase() + item.category_type.slice(1)}</span>
+                    <span class="category-type ${item.category_type}">${item.category_type === "both" ? "Physical & Online" : item.category_type.charAt(0).toUpperCase() + item.category_type.slice(1)}</span>
                 </div>
                 <img src="../${item.image_path}" alt="${item[`${classification}_name`]}" class="card-image">
             `;

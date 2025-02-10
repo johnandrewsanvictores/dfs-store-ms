@@ -12,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $texture = $_POST['texture'] ?? null;
         $material = $_POST['material'] ?? null;
         $hex_value = $_POST['hexvalue'] ?? null;
+        $color_name = $_POST['color-name'] ?? null;
 
         if ($classification == "category") {
             $category_name = $_POST['category'];
@@ -24,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $category_id = $_POST['category_id'];
             $response = $classification_model->add_classification_with_img($classification, $brand_name, $brand_image, $category_id, null);
         } else {
-            $response = $classification_model->add_classification($classification, $texture, $material, $hex_value);
+            $response = $classification_model->add_classification($classification, $texture, $material, $hex_value, $color_name);
         }
         echo $response;
         exit();
@@ -85,6 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $texture = null;
             $material = null;
             $hex_value = null;
+            $color_name = null;
 
             switch ($classification) {
                 case 'texture':
@@ -95,10 +97,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     break;
                 case 'color':
                     $hex_value = $_POST['hexvalue'];
+                    $color_name = $_POST['color-name'];
                     break;
             }
 
-            $response = $classification_model->update_classification($id, $classification, $texture, $material, $hex_value);
+            $response = $classification_model->update_classification($id, $classification, $texture, $material, $hex_value, $color_name);
         }
         echo $response;
         exit();
@@ -156,7 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['action'])) {
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_all_colors") {
-        $response = $classification_model->get_all_items('color', 'hex_value', $search, $sort, $status);
+        $response = $classification_model->get_all_items('color', 'color_name', $search, $sort, $status);
         echo $response;
         exit();
     } elseif ($_GET['action'] == "get_brands_by_category" && isset($_GET['category_id'])) {

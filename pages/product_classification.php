@@ -54,6 +54,7 @@
                     <label>Category Type:</label>
                     <select id="category-type-dropdown">
                         <option value="">All Types</option>
+                        <option value="both">Physical & Online</option>
                         <option value="physical">Physical</option>
                         <option value="online">Online</option>
                     </select>

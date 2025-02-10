@@ -7,10 +7,11 @@ const Form_Dom_Manipulate = (function() {
     const classification_select = document.querySelector("#classification-select");
     const material_container = document.querySelector(".material-container-form");
     const texture_container = document.querySelector(".texture-container-form");
-    const color_form_container = document.querySelector(".color-form-container");
+    const color_form_container = document.querySelector(".color-main-container");
     const color_input_container = document.querySelector(".color-input");
     const color_input = color_input_container.querySelector("input");
     const color_input_field = document.querySelector(".color-form-container input");
+    const color_name = document.getElementById("color-name");
     
     const texture_el = document.getElementById('texture');
     const material_el = document.getElementById('material');
@@ -75,7 +76,6 @@ const Form_Dom_Manipulate = (function() {
                 hide_inputs();
                 classification_select.value = "color";
                 color_form_container.style.display = "flex";
-                color_input_container.style.display = "flex";
                 break;
 
             case 'category':
@@ -100,7 +100,6 @@ const Form_Dom_Manipulate = (function() {
         material_container.style.display = "none";
         texture_container.style.display = "none";
         color_form_container.style.display = "none";
-        color_input_container.style.display = "none";
         category_container.style.display = "none";
         brand_container.style.display = "none";
         category_image_preview.style.display = "none";
@@ -158,6 +157,7 @@ const Form_Dom_Manipulate = (function() {
             case 'color':
                 color_el.value = data.hex_value;
                 color_input_field.value = data.hex_value;
+                color_name.value = data.color_name;
                 break;
 
             case 'category':
@@ -248,11 +248,16 @@ const Form_Validation = (function() {
     const material_el = document.getElementById('material');
     const color_el = document.getElementById('hexvalue');
     const color_input = document.getElementById('color');
+    const color_name_el = document.getElementById('color-name')
+
+
     const category_el = document.getElementById('category');
     const category_image_el = document.getElementById('category-image');
     const brand_el = document.getElementById('brand');
     const brand_image_el = document.getElementById('brand-image');
+
     const category_select_el = document.getElementById('category-select')
+    const category_type_el = document.getElementById('category-type');
 
     const submit_btn = document.querySelector('#classification-add-btn');
 
@@ -261,11 +266,15 @@ const Form_Validation = (function() {
         const texture = texture_el.value.trim();
         const material = material_el.value.trim();
         const color = color_el.value.trim();
+        const color_name = color_name_el.value.trim();
+
         const category = category_el.value.trim();
         const category_image = category_image_el.value;
         const brand = brand_el.value.trim();
         const brand_image = brand_image_el.value;
         const category_select = category_select_el.value.trim();
+
+        const category_type = category_type_el.value.trim();
 
         let isValid = true;
 
@@ -293,6 +302,8 @@ const Form_Validation = (function() {
             } else if (!/^#[0-9A-F]{6}$/i.test(color)) {
                 show_error('hexvalue', 'Please enter a valid color hex value.');
                 isValid = false;
+            } else if (color_name == "") {
+                show_error('color-name', "Please enter a color name");
             }
         }
 
@@ -303,6 +314,9 @@ const Form_Validation = (function() {
             }else if (category_image === '' && submit_btn.textContent === 'Add') {
                 show_error('category-image', 'Please select a category image.');
                 isValid = false;
+            }else if(category_type === '') {
+                show_error('category-type', 'Please select a category type');
+                isValid = false;``
             }
         }
 
